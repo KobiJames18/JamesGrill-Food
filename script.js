@@ -359,8 +359,17 @@ function renderCartPage(){
     if(deliveryEl) deliveryEl.textContent = subtotal > 0 ? money(deliveryFee) : '—';
     if(totalEl) totalEl.textContent = money(total);
 
+    // NOTE: checkoutBtn is an <a>, not a <button> — the `disabled` property
+    // does nothing on anchor elements. Use a class + aria-disabled instead,
+    // paired with the click-guard already in cart.html that blocks navigation
+    // when the cart is empty. Add `.btn.is-disabled { opacity:.5; pointer-events:none; }`
+    // to style.css if you want it to look disabled too, not just behave that way.
     const checkoutBtn = document.getElementById('checkoutBtn');
-    if(checkoutBtn) checkoutBtn.disabled = cart.length === 0;
+    if(checkoutBtn){
+        const isEmpty = cart.length === 0;
+        checkoutBtn.classList.toggle('is-disabled', isEmpty);
+        checkoutBtn.setAttribute('aria-disabled', isEmpty ? 'true' : 'false');
+    }
 }
 
 /* ============================================

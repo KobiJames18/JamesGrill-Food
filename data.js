@@ -6,23 +6,23 @@ const MENU_ITEMS = [
     name: "Grilled Half Chicken",
     category: "grills",
     desc: "Seasoned with tradition, and grilled to perfection over open flame.",
-    price: [150,200],
+    price: [150, 200],
     image: "images/Grilled Half Chickens.jfif",
     icon: "fa-drumstick-bite",
     rating: 5,
     badge: "Popular"
   },
-{
-  id: "goat-meat",
-  name: "Goat Meat",
-  category: "grills",
-  desc: "Slow-grilled goat meat, smoky and tender, cut fresh to order.",
-  price: [100 , 120],
-  image: "images/goat.jpg.jfif.jfif",
-  icon: "fa-fire",
-  rating: 4,
-  badge: "Popular"
-}, 
+  {
+    id: "goat-meat",
+    name: "Goat Meat",
+    category: "grills",
+    desc: "Slow-grilled goat meat, smoky and tender, cut fresh to order.",
+    price: [100, 120],
+    image: "images/goat.jpg.jfif.jfif",
+    icon: "fa-fire",
+    rating: 4,
+    badge: "Popular"
+  },
   {
     id: "shawarma",
     name: "Chicken Shawarma",
@@ -51,7 +51,7 @@ const MENU_ITEMS = [
     category: "snacks",
     desc: "Flaky pastry packed with seasoned minced meat, baked fresh daily.",
     price: [35, 50],
-    image:  "images/meatpie.jfif",
+    image: "images/meatpie.jfif",
     icon: "fa-cookie",
     rating: 4
   },
@@ -65,16 +65,16 @@ const MENU_ITEMS = [
     icon: "fa-egg",
     rating: 4
   },
- {
-  id: "cold-drinks",
-  name: "Cold Drinks",
-  category: "drinks",
-  desc: "A chilled lineup of soft drinks, juices and bottled water.",
-  price: [20, 30],
-  image: "images/cold drinks.jpg.jfif.jfif",
-  icon: "fa-glass-water",
-  rating: 4
-},
+  {
+    id: "cold-drinks",
+    name: "Cold Drinks",
+    category: "drinks",
+    desc: "A chilled lineup of soft drinks, juices and bottled water.",
+    price: [20, 30],
+    image: "images/cold drinks.jpg.jfif.jfif",
+    icon: "fa-glass-water",
+    rating: 4
+  }
 ];
 
 const CATEGORIES = [

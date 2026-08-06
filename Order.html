@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu JamesGrill House</title>
+    <title>Order History — TomGrill House</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-    <a href="index.html" class="logo"><i class="fas fa-fire-flame-curved"></i>JamesGrill House</a>
+    <a href="index.html" class="logo"><i class="fas fa-fire-flame-curved"></i>TomGrill House</a>
 
     <div class="nav-wrap">
         <nav class="navbar">
             <a href="index.html">Home</a>
-            <a href="menu.html" class="active">Menu</a>
+            <a href="menu.html">Menu</a>
             <a href="contact.html">Contact</a>
         </nav>
 
@@ -39,32 +39,24 @@
 </header>
 
 <section class="page-hero">
-    <span class="eyebrow">Full Menu</span>
-    <h1 class="heading">Everything off <span>the grill</span></h1>
-    <p class="sub" style="max-width:56rem; margin:1rem auto 0;">Search or filter by category, then add straight to your cart.</p>
+    <span class="eyebrow">Track It</span>
+    <h1 class="heading">Order <span>history</span></h1>
 </section>
 
-<section class="menu-section">
-    <div class="menu-toolbar">
-        <div class="menu-search">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="menuSearchInput" placeholder="Search the menu...">
-        </div>
-        <div class="filter-pills" id="filterPills"></div>
-    </div>
-
-    <div class="box-container" id="menuGrid"></div>
+<section>
+    <div class="form-msg success" id="orderPlacedBanner" style="max-width:70rem; margin:0 auto 3rem;"></div>
+    <div style="max-width:70rem; margin:0 auto;" id="ordersList"></div>
 </section>
 
 <footer>
     <div class="footer-grid">
         <div>
-            <div class="logo"><i class="fa-solid fa-fire-flame-curved"></i>JamesGrill House</div>
-            <p>Flame grilled favourites, made fresh and delivered hot. From our grill to your door.</p>
+            <div class="logo"><i class="fa-solid fa-fire-flame-curved"></i>TomGrill House</div>
+            <p>Flame-grilled favourites, made fresh and delivered hot. From our grill to your door.</p>
             <div class="footer-social">
-                <a href="https://www.facebook.com/kobi.james.180" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                <a href="https://www.instagram.com/kobi_james_/?__pwa=1#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                <a href="https://wa.me/message/HY6G4N3QWZMWE1" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
         </div>
         <div class="footer-col">
@@ -81,14 +73,14 @@
         </div>
         <div class="footer-col">
             <h4>Get In Touch</h4>
-            <a href="tel:+23234810013">+232 34810013</a>
-            <a href="mailto:kobirobert3000@gmail.com">kobirobert3000@gmail.com</a>
-            <a href="https://www.google.com/maps/search/?api=1&query=Rokel+Container+Freetown+Sierra+Leone" target="_blank" rel="noopener">Rokel Container Freetown, Sierra Leone</a>
+            <a href="tel:+23200000000">+232 00 000 000</a>
+            <a href="mailto:hello@tomgrillhouse.com">hello@tomgrillhouse.com</a>
+            <a href="#">Freetown, Sierra Leone</a>
         </div>
     </div>
     <div class="footer-bottom">
-        <span>&copy; <span id="year"></span> Kobi James Robert. All rights reserved.</span>
-        <span>Designed &amp; built by <a href="#">Kobi James Robert</a></span>
+        <span>&copy; <span id="year"></span> TomGrill House. All rights reserved.</span>
+        <span>Designed &amp; built by <a href="#">the TomGrill House web team</a></span>
     </div>
 </footer>
 

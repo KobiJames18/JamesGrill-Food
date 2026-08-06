@@ -172,6 +172,9 @@ section{
 .btn.small{ padding:.9rem 2rem; font-size:1.3rem; }
 .btn.block{ width:100%; justify-content:center; }
 .btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+/* anchor-based buttons (e.g. #checkoutBtn) can't use :disabled — script.js
+   toggles this class instead when the cart is empty */
+.btn.is-disabled{ opacity:.5; cursor:not-allowed; pointer-events:none; transform:none; box-shadow:none; }
 
 .icon-btn{
     width:4.2rem; height:4.2rem;

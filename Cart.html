@@ -83,9 +83,9 @@
         </div>
         <div class="footer-col">
             <h4>Get In Touch</h4>
-            <a href="tel:+232 34810013">+232 34810013</a>
+            <a href="tel:+23234810013">+232 34810013</a>
             <a href="mailto:kobirobert3000@gmail.com">kobirobert3000@gmail.com</a>
-            <a href="#">Rokel Container Freetown, Sierra Leone</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Rokel+Container+Freetown+Sierra+Leone" target="_blank" rel="noopener">Rokel Container Freetown, Sierra Leone</a>
         </div>
     </div>
     <div class="footer-bottom">
@@ -100,7 +100,10 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 // checkout button should behave like a disabled control when the cart is empty
 document.getElementById('checkoutBtn').addEventListener('click', (e) => {
-    if(getCart().length === 0) e.preventDefault();
+    if (getCart().length === 0) {
+        e.preventDefault();
+        alert('Your cart is empty. Add an item from the menu before checking out.');
+    }
 });
 </script>
 </body>
