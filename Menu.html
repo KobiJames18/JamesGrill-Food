@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu JamesGrill House</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><i class="fas fa-fire-flame-curved"></i>JamesGrill House</a>
+
+    <div class="nav-wrap">
+        <nav class="navbar">
+            <a href="index.html">Home</a>
+            <a href="menu.html" class="active">Menu</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+
+        <div class="header-actions">
+            <button class="icon-btn" data-search-toggle aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun"></i></button>
+            <a href="orders.html" class="icon-btn" aria-label="Order history"><i class="fa-solid fa-receipt"></i></a>
+            <a href="cart.html" class="icon-btn" aria-label="Cart">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="badge-count" data-cart-count>0</span>
+            </a>
+        </div>
+    </div>
+
+    <div id="menu-bar"><i class="fa-solid fa-bars"></i></div>
+
+    <form class="search-box" id="headerSearchForm">
+        <input type="text" id="headerSearchInput" placeholder="Search for grilled chicken, shawarma...">
+        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
+</header>
+
+<section class="page-hero">
+    <span class="eyebrow">Full Menu</span>
+    <h1 class="heading">Everything off <span>the grill</span></h1>
+    <p class="sub" style="max-width:56rem; margin:1rem auto 0;">Search or filter by category, then add straight to your cart.</p>
+</section>
+
+<section class="menu-section">
+    <div class="menu-toolbar">
+        <div class="menu-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="menuSearchInput" placeholder="Search the menu...">
+        </div>
+        <div class="filter-pills" id="filterPills"></div>
+    </div>
+
+    <div class="box-container" id="menuGrid"></div>
+</section>
+
+<footer>
+    <div class="footer-grid">
+        <div>
+            <div class="logo"><i class="fa-solid fa-fire-flame-curved"></i>JamesGrill House</div>
+            <p>Flame grilled favourites, made fresh and delivered hot. From our grill to your door.</p>
+            <div class="footer-social">
+                <a href="https://www.facebook.com/kobi.james.180" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/kobi_james_/?__pwa=1#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://wa.me/message/HY6G4N3QWZMWE1" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>Explore</h4>
+            <a href="index.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+        <div class="footer-col">
+            <h4>Account</h4>
+            <a href="cart.html">Cart</a>
+            <a href="checkout.html">Checkout</a>
+            <a href="orders.html">Order History</a>
+        </div>
+        <div class="footer-col">
+            <h4>Get In Touch</h4>
+            <a href="tel:+232 34810013">+232 34810013</a>
+            <a href="mailto:kobirobert3000@gmail.com">kobirobert3000@gmail.com</a>
+            <a href="#">Rokel Container Freetown, Sierra Leone</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>&copy; <span id="year"></span> Kobi James Robert. All rights reserved.</span>
+        <span>Designed &amp; built by <a href="#">Kobi James Robert</a></span>
+    </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
