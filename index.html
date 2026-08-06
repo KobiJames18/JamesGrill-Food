@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JamesGrill House Food Made With Love</title>
+    <meta name="description" content="Flame-grilled chicken, goat meat, shawarma and more. Order online from JamesGrill House.">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- header -->
+<header>
+    <a href="index.html" class="logo"><i class="fas fa-fire-flame-curved"></i>JamesGrill House</a>
+
+    <div class="nav-wrap">
+        <nav class="navbar">
+            <a href="index.html" class="active">Home</a>
+            <a href="menu.html#speciality">Speciality</a>
+            <a href="menu.html">Menu</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+
+        <div class="header-actions">
+            <button class="icon-btn" data-search-toggle aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun"></i></button>
+            <a href="orders.html" class="icon-btn" aria-label="Order history"><i class="fa-solid fa-receipt"></i></a>
+            <a href="cart.html" class="icon-btn" aria-label="Cart">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="badge-count" data-cart-count>0</span>
+            </a>
+        </div>
+    </div>
+
+    <div id="menu-bar"><i class="fa-solid fa-bars"></i></div>
+
+    <form class="search-box" id="headerSearchForm">
+        <input type="text" id="headerSearchInput" placeholder="Search for grilled chicken, shawarma...">
+        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
+</header>
+
+<!-- hero -->
+<section class="hero" id="home">
+    <div class="hero-grid">
+        <div class="content">
+            <span class="eyebrow">Flame Grilled Daily</span>
+            <h1>Food made <span>with love</span></h1>
+            <p>Welcome to JamesGrill House, where every flame tells a story and every bite brings joy. We don't just serve food we serve passion, flavor, and memories.</p>
+            <div class="hero-cta">
+                <a href="menu.html" class="btn">Order Now <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="#speciality" class="btn outline">See Speciality</a>
+            </div>
+            <div class="hero-stats">
+                <div><strong>7+</strong><span>Signature Dishes</span></div>
+                <div><strong>15 min</strong><span>Avg. Grill Time</span></div>
+            </div>
+        </div>
+
+        <div class="visual">
+            <div class="ring"></div>
+            <div class="plate">
+                <img src="images/goatmeat.jpg.jfif.jfif"Flame grilled chicken fresh off the grill">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- popular categories -->
+<section class="categories" id="speciality">
+    <div class="section-head">
+        <span class="eyebrow">Browse</span>
+        <h1 class="heading">Popular <span>categories</span></h1>
+        <p class="sub">Everything on the menu, sorted the way you actually order it.</p>
+    </div>
+    <div class="box-container" id="categoryGrid"></div>
+</section>
+
+<!-- featured meals -->
+<section class="popular" id="popular">
+    <div class="section-head">
+        <span class="eyebrow">Fan Favourites</span>
+        <h1 class="heading">Featured <span>meals</span></h1>
+        <p class="sub">The dishes our regulars order again and again.</p>
+    </div>
+    <div class="box-container" id="featuredGrid"></div>
+    <div style="text-align:center; margin-top:3.5rem;">
+        <a href="menu.html" class="btn outline">View Full Menu <i class="fa-solid fa-utensils"></i></a>
+    </div>
+</section>
+
+<!-- reviews -->
+<section class="reviews" id="review">
+    <div class="section-head">
+        <span class="eyebrow">Word On The Street</span>
+        <h1 class="heading">What people <span>are saying</span></h1>
+    </div>
+    <div class="box-container">
+        <div class="review-card">
+            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <p>The grilled chicken here is unmatched smoky, juicy, and never dry. It's become our Friday tradition.</p>
+            <div class="who"><div class="avatar">A</div><div><strong>Kobi J.</strong><span>Freetown</span></div></div>
+        </div>
+        <div class="review-card">
+            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div>
+            <p>Fast delivery, hot food, and the shawarma sauce is genuinely addictive. Highly recommend the meal combo.</p>
+            <div class="who"><div class="avatar">M</div><div><strong>Jeremiah Sesay.</strong><span>Freetown</span></div></div>
+        </div>
+        <div class="review-card">
+            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <p>Ordered online for a family gathering and everything arrived on time and still hot. Will be ordering again.</p>
+            <div class="who"><div class="avatar">F</div><div><strong>Martin Rayan.</strong><span>Freetown</span></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- footer -->
+<footer>
+    <div class="footer-grid">
+        <div>
+            <div class="logo"><i class="fa-solid fa-fire-flame-curved"></i>JamesGrill House</div>
+            <p>Flame grilled favourites, made fresh and delivered hot. From our grill to your door.</p>
+            <div class="footer-social">
+                <a href="https://www.facebook.com/kobi.james.180" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/kobi_james_/?__pwa=1#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://wa.me/message/HY6G4N3QWZMWE1" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>Explore</h4>
+            <a href="index.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+        <div class="footer-col">
+            <h4>Account</h4>
+            <a href="cart.html">Cart</a>
+            <a href="checkout.html">Checkout</a>
+            <a href="orders.html">Order History</a>
+        </div>
+        <div class="footer-col">
+            <h4>Get In Touch</h4>
+            <a href="tel:+23234810013">+232 34810013</a>
+            <a href="mailto:kobirobert3000@gmail.com">kobirobert3000@gmail.com</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Rokel+Container+Freetown+Sierra+Leone" target="_blank" rel="noopener">Rokel Container Freetown, Sierra Leone</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>&copy; <span id="year"></span> JamesGrill House. All rights reserved.</span>
+        <span>Designed &amp; built by <a href="#">the JamesGrill House web team</a></span>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="data.js"></script>
+<script src="menu-loader.js"></script>
+<script src="script.js"></script>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
