@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Cart JamesGrill House</title>
+    <title>Order History JamesGrill House</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -39,23 +39,13 @@
 </header>
 
 <section class="page-hero">
-    <span class="eyebrow">Your Order</span>
-    <h1 class="heading">Your <span>cart</span></h1>
+    <span class="eyebrow">Track It</span>
+    <h1 class="heading">Order <span>history</span></h1>
 </section>
 
-<section class="cart-section">
-    <div class="cart-layout">
-        <div id="cartItems"></div>
-
-        <div class="summary-card">
-            <h3>Order Summary</h3>
-            <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">Le 0</span></div>
-            <div class="summary-row"><span>Delivery</span><span id="cartDelivery"></span></div>
-            <div class="summary-row total"><span>Total</span><span id="cartTotal">Le 0</span></div>
-            <a href="checkout.html" class="btn block" id="checkoutBtn" style="margin-top:2rem;">Proceed to Checkout <i class="fa-solid fa-arrow-right"></i></a>
-            <a href="menu.html" class="btn outline block" style="margin-top:1.2rem;">Add More Items</a>
-        </div>
-    </div>
+<section>
+    <div class="form-msg success" id="orderPlacedBanner" style="max-width:70rem; margin:0 auto 3rem;"></div>
+    <div style="max-width:70rem; margin:0 auto;" id="ordersList"></div>
 </section>
 
 <footer>
@@ -94,20 +84,8 @@
     </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-client.js"></script>
 <script src="data.js"></script>
-<script src="menu-loader.js"></script>
 <script src="script.js"></script>
-<script>
-document.getElementById('year').textContent = new Date().getFullYear();
-// checkout button should behave like a disabled control when the cart is empty
-document.getElementById('checkoutBtn').addEventListener('click', (e) => {
-    if (getCart().length === 0) {
-        e.preventDefault();
-        alert('Your cart is empty. Add an item from the menu before checking out.');
-    }
-});
-</script>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

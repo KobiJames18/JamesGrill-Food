@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Cart JamesGrill House</title>
+    <title>Checkout JamesGrill House</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -39,21 +39,58 @@
 </header>
 
 <section class="page-hero">
-    <span class="eyebrow">Your Order</span>
-    <h1 class="heading">Your <span>cart</span></h1>
+    <span class="eyebrow">Almost There</span>
+    <h1 class="heading">Checkout</h1>
 </section>
 
 <section class="cart-section">
     <div class="cart-layout">
-        <div id="cartItems"></div>
+        <div class="form-card">
+            <form id="checkoutForm">
+                <div class="field">
+                    <label for="coName">Full Name</label>
+                    <input type="text" id="coName" required placeholder="e.g. Kobi ">
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label for="coPhone">Phone Number</label>
+                        <input type="tel" id="coPhone" required placeholder="+232 34810013">
+                    </div>
+                    <div class="field">
+                        <label for="coCity">City / Area</label>
+                        <input type="text" id="coCity" required placeholder="e.g. Rokel, Freetown">
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="coAddress">Delivery Address</label>
+                    <textarea id="coAddress" required placeholder="Street, house number and any landmark to help our rider find you"></textarea>
+                </div>
+
+                <div class="field">
+                    <label>Payment Method</label>
+                    <div class="pay-options">
+                        <label class="pay-option">
+                            <input type="radio" name="payment" value="Cash on Delivery" checked>
+                            <i class="fa-solid fa-money-bill-wave"></i> Cash on Delivery
+                        </label>
+                        <label class="pay-option">
+                            <input type="radio" name="payment" value="Mobile Money">
+                            <i class="fa-solid fa-mobile-screen"></i> Mobile Money
+                        </label>
+                        <label class="pay-option">
+                            <input type="radio" name="payment" value="Card">
+                            <i class="fa-solid fa-credit-card"></i> Card on Delivery
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn block">Place Order <i class="fa-solid fa-fire"></i></button>
+            </form>
+        </div>
 
         <div class="summary-card">
             <h3>Order Summary</h3>
-            <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">Le 0</span></div>
-            <div class="summary-row"><span>Delivery</span><span id="cartDelivery"></span></div>
-            <div class="summary-row total"><span>Total</span><span id="cartTotal">Le 0</span></div>
-            <a href="checkout.html" class="btn block" id="checkoutBtn" style="margin-top:2rem;">Proceed to Checkout <i class="fa-solid fa-arrow-right"></i></a>
-            <a href="menu.html" class="btn outline block" style="margin-top:1.2rem;">Add More Items</a>
+            <div id="checkoutSummary"></div>
         </div>
     </div>
 </section>
@@ -94,20 +131,8 @@
     </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-client.js"></script>
 <script src="data.js"></script>
-<script src="menu-loader.js"></script>
 <script src="script.js"></script>
-<script>
-document.getElementById('year').textContent = new Date().getFullYear();
-// checkout button should behave like a disabled control when the cart is empty
-document.getElementById('checkoutBtn').addEventListener('click', (e) => {
-    if (getCart().length === 0) {
-        e.preventDefault();
-        alert('Your cart is empty. Add an item from the menu before checking out.');
-    }
-});
-</script>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

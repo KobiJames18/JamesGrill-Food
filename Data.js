@@ -1,32 +1,28 @@
-// NOTE: this is now a FALLBACK only. The live menu is loaded from Supabase
-// by menu-loader.js. Edit menu items in the admin panel — this file is used
-// only if the database is unreachable.
-
 // Shared menu data — single source of truth for every page.
 // Prices are in Leones (Le), stored as [min, max] per original site content.
-const DEFAULT_MENU_ITEMS = [
+const MENU_ITEMS = [
   {
     id: "grilled-chicken",
     name: "Grilled Half Chicken",
     category: "grills",
     desc: "Seasoned with tradition, and grilled to perfection over open flame.",
-    price: [150, 200],
+    price: [150,200],
     image: "images/Grilled Half Chickens.jfif",
     icon: "fa-drumstick-bite",
     rating: 5,
     badge: "Popular"
   },
-  {
-    id: "goat-meat",
-    name: "Goat Meat",
-    category: "grills",
-    desc: "Slow-grilled goat meat, smoky and tender, cut fresh to order.",
-    price: [100, 120],
-    image: "images/goat.jpg.jfif.jfif",
-    icon: "fa-fire",
-    rating: 4,
-    badge: "Popular"
-  },
+{
+  id: "goat-meat",
+  name: "Goat Meat",
+  category: "grills",
+  desc: "Slow-grilled goat meat, smoky and tender, cut fresh to order.",
+  price: [100 , 120],
+  image: "images/goat.jpg.jfif.jfif",
+  icon: "fa-fire",
+  rating: 4,
+  badge: "Popular"
+},
   {
     id: "shawarma",
     name: "Chicken Shawarma",
@@ -69,19 +65,19 @@ const DEFAULT_MENU_ITEMS = [
     icon: "fa-egg",
     rating: 4
   },
-  {
-    id: "cold-drinks",
-    name: "Cold Drinks",
-    category: "drinks",
-    desc: "A chilled lineup of soft drinks, juices and bottled water.",
-    price: [20, 30],
-    image: "images/cold drinks.jpg.jfif.jfif",
-    icon: "fa-glass-water",
-    rating: 4
-  }
+ {
+  id: "cold-drinks",
+  name: "Cold Drinks",
+  category: "drinks",
+  desc: "A chilled lineup of soft drinks, juices and bottled water.",
+  price: [20, 30],
+  image: "images/cold drinks.jpg.jfif.jfif",
+  icon: "fa-glass-water",
+  rating: 4
+},
 ];
 
-const DEFAULT_CATEGORIES = [
+const CATEGORIES = [
   { id: "grills", label: "Grills", icon: "fa-fire" },
   { id: "wraps", label: "Wraps", icon: "fa-pepper-hot" },
   { id: "snacks", label: "Snacks", icon: "fa-cookie" },
