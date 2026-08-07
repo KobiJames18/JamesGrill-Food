@@ -455,10 +455,10 @@ function initCheckoutPage(){
 /* ============================================
    ORDERS PAGE
    ============================================ */
-function initOrdersPage(){
+async function initOrdersPage(){
     const list = document.getElementById('ordersList');
     if(!list) return;
-    const orders = getOrders();
+    let orders = getOrders();
     const params = new URLSearchParams(window.location.search);
     const justPlaced = params.get('placed');
 
@@ -471,6 +471,31 @@ function initOrdersPage(){
             banner.classList.remove('show');
         }
     }
+
+    renderOrdersList(orders);
+
+    // fetch live status from Supabase so admin updates (e.g. "Out for Delivery")
+    // show up here without the customer needing to place a new order
+    if (window.supabaseClient && orders.length > 0){
+        const ids = orders.map(o => o.id);
+        const { data, error } = await window.supabaseClient
+            .from('orders')
+            .select('id, status')
+            .in('id', ids);
+
+        if (!error && data && data.length > 0){
+            const statusById = Object.fromEntries(data.map(r => [r.id, r.status]));
+            orders = orders.map(o => statusById[o.id] ? { ...o, status: statusById[o.id] } : o);
+            renderOrdersList(orders);
+        } else if (error) {
+            console.warn('Could not fetch live order status:', error.message);
+        }
+    }
+}
+
+function renderOrdersList(orders){
+    const list = document.getElementById('ordersList');
+    if(!list) return;
 
     if(orders.length === 0){
         list.innerHTML = `
