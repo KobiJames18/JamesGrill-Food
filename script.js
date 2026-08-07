@@ -175,7 +175,7 @@ function mealCardHTML(item){
         : `<div class="icon-fallback"><i class="fa-solid ${item.icon}"></i></div>`;
     const badge = item.badge ? `<span class="badge">${item.badge}</span>` : '';
     return `
-    <div class="meal-card" data-category="${item.category}" data-name="${item.name.toLowerCase()}">
+    <div class="meal-card" data-id="${item.id}" data-category="${item.category}" data-name="${item.name.toLowerCase()}">
         <div class="thumb">
             ${thumb}
             <span class="price-tag">${money(item.price[0])} - ${money(item.price[1])}</span>
@@ -214,6 +214,90 @@ function wireAddToCartButtons(root = document){
 }
 
 /* ============================================
+   MEAL DETAIL MODAL
+   ============================================ */
+let mealModalState = { id: null, qty: 1 };
+
+function ensureMealModal(){
+    if (document.getElementById('mealModalBackdrop')) return;
+
+    const modal = document.createElement('div');
+    modal.className = 'meal-modal-backdrop';
+    modal.id = 'mealModalBackdrop';
+    modal.innerHTML = `
+        <div class="meal-modal">
+            <button class="meal-modal-close" id="mealModalClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="meal-modal-media" id="mealModalMedia"></div>
+            <div class="meal-modal-body">
+                <h3 id="mealModalName"></h3>
+                <div id="mealModalStars"></div>
+                <p id="mealModalDesc"></p>
+                <div class="meal-modal-price" id="mealModalPrice"></div>
+                <div class="meal-modal-qty">
+                    <button id="mealModalQtyDown" aria-label="Decrease quantity">&minus;</button>
+                    <span id="mealModalQtyValue">1</span>
+                    <button id="mealModalQtyUp" aria-label="Increase quantity">+</button>
+                </div>
+                <button class="btn block" id="mealModalAddBtn">Add to Cart</button>
+            </div>
+        </div>`;
+    document.body.appendChild(modal);
+
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeMealModal(); });
+    document.getElementById('mealModalClose').addEventListener('click', closeMealModal);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMealModal(); });
+
+    document.getElementById('mealModalQtyDown').addEventListener('click', () => {
+        if (mealModalState.qty > 1) mealModalState.qty--;
+        document.getElementById('mealModalQtyValue').textContent = mealModalState.qty;
+    });
+    document.getElementById('mealModalQtyUp').addEventListener('click', () => {
+        mealModalState.qty++;
+        document.getElementById('mealModalQtyValue').textContent = mealModalState.qty;
+    });
+    document.getElementById('mealModalAddBtn').addEventListener('click', () => {
+        addToCart(mealModalState.id, mealModalState.qty);
+        closeMealModal();
+    });
+}
+
+function openMealModal(id){
+    const item = findItem(id);
+    if (!item) return;
+    ensureMealModal();
+
+    mealModalState = { id, qty: 1 };
+
+    const media = document.getElementById('mealModalMedia');
+    media.innerHTML = item.image
+        ? `<img src="${item.image}" alt="${item.name}">`
+        : `<div class="icon-fallback"><i class="fa-solid ${item.icon}"></i></div>`;
+
+    document.getElementById('mealModalName').textContent = item.name;
+    document.getElementById('mealModalStars').innerHTML = starsHTML(item.rating);
+    document.getElementById('mealModalDesc').textContent = item.desc;
+    document.getElementById('mealModalPrice').textContent = `${money(item.price[0])} – ${money(item.price[1])} per order`;
+    document.getElementById('mealModalQtyValue').textContent = mealModalState.qty;
+
+    document.getElementById('mealModalBackdrop').classList.add('show');
+}
+
+function closeMealModal(){
+    const backdrop = document.getElementById('mealModalBackdrop');
+    if (backdrop) backdrop.classList.remove('show');
+}
+
+function wireMealCardClicks(root = document){
+    root.querySelectorAll('.meal-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('[data-add-to-cart]')) return; // let the Add button work on its own
+            const id = card.getAttribute('data-id');
+            if (id) openMealModal(id);
+        });
+    });
+}
+
+/* ============================================
    HOME PAGE
    ============================================ */
 function initHomePage(){
@@ -224,6 +308,7 @@ function initHomePage(){
     ).slice(0, 6);
     renderGrid(featuredEl, featured);
     wireAddToCartButtons(featuredEl);
+    wireMealCardClicks(featuredEl);
 
     const catEl = document.getElementById('categoryGrid');
     if(catEl){
@@ -267,6 +352,7 @@ function initMenuPage(){
         }
         renderGrid(grid, items);
         wireAddToCartButtons(grid);
+        wireMealCardClicks(grid);
     }
 
     if(pillsWrap){
@@ -539,6 +625,80 @@ function initContactPage(){
 }
 
 /* ============================================
+   REVIEWS (homepage)
+   ============================================ */
+function reviewCardHTML(r){
+    return `
+    <div class="review-card">
+        ${starsHTML(r.rating)}
+        <p>${r.message}</p>
+        <div class="who">
+            <div class="avatar">${r.name.charAt(0).toUpperCase()}</div>
+            <div><strong>${r.name}</strong><span>${r.location || ''}</span></div>
+        </div>
+    </div>`;
+}
+
+async function loadReviews(){
+    const grid = document.getElementById('reviewsGrid');
+    if(!grid) return;
+
+    if(!window.supabaseClient){
+        grid.innerHTML = `<div class="empty-state"><p>Reviews are unavailable right now.</p></div>`;
+        return;
+    }
+
+    const { data, error } = await window.supabaseClient
+        .from('reviews')
+        .select('*')
+        .eq('approved', true)
+        .order('created_at', { ascending: false })
+        .limit(6);
+
+    if(error || !data || data.length === 0){
+        grid.innerHTML = `<div class="empty-state"><p>No reviews yet — be the first!</p></div>`;
+        return;
+    }
+
+    grid.innerHTML = data.map(reviewCardHTML).join('');
+}
+
+function initReviewForm(){
+    const form = document.getElementById('reviewForm');
+    if(!form) return;
+    const msg = document.getElementById('reviewMsg');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if(!window.supabaseClient){
+            msg.textContent = "Sorry, reviews aren't available right now.";
+            msg.className = 'form-msg error show';
+            return;
+        }
+
+        const name = document.getElementById('rvName').value.trim();
+        const location = document.getElementById('rvLocation').value.trim();
+        const rating = Number(document.getElementById('rvRating').value);
+        const message = document.getElementById('rvMessage').value.trim();
+
+        const { error } = await window.supabaseClient.from('reviews').insert({
+            name, location: location || null, rating, message, approved: false
+        });
+
+        if(error){
+            msg.textContent = "Something went wrong submitting your review. Please try again.";
+            msg.className = 'form-msg error show';
+            return;
+        }
+
+        msg.textContent = "Thanks! Your review has been submitted and will appear once approved.";
+        msg.className = 'form-msg success show';
+        form.reset();
+    });
+}
+
+/* ============================================
    INIT
    ============================================ */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -553,4 +713,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     initCheckoutPage();
     initOrdersPage();
     initContactPage();
+    loadReviews();
+    initReviewForm();
 });

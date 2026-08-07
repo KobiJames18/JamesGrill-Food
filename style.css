@@ -113,6 +113,12 @@ section{
     line-height:1.6;
 }
 
+/* grill-mark signature motif: diagonal char-lines, used as dividers & hover burn */
+.grill-lines{
+    background-image: repeating-linear-gradient(135deg, var(--flame) 0 3px, transparent 3px 22px);
+    opacity:.5;
+}
+
 /* ============================================
    BUTTONS
    ============================================ */
@@ -166,6 +172,8 @@ section{
 .btn.small{ padding:.9rem 2rem; font-size:1.3rem; }
 .btn.block{ width:100%; justify-content:center; }
 .btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+/* anchor-based buttons (e.g. #checkoutBtn) can't use :disabled — script.js
+   toggles this class instead when the cart is empty */
 .btn.is-disabled{ opacity:.5; cursor:not-allowed; pointer-events:none; transform:none; box-shadow:none; }
 
 .icon-btn{
@@ -272,6 +280,7 @@ header .logo i{
     gap:1.2rem;
 }
 
+/* mobile menu button — centered flex icon, not a stray font glyph */
 #menu-bar{
     display:none;
     width:4.4rem; height:4.4rem;
@@ -287,6 +296,7 @@ header .logo i{
 }
 #menu-bar i{ pointer-events:none; }
 
+/* search flyout */
 .search-box{
     position:absolute;
     top:100%; right:9%;
@@ -503,7 +513,7 @@ header .logo i{
 }
 
 /* ============================================
-   MEAL CARDS
+   MEAL CARDS (grid used on home + menu)
    ============================================ */
 .box-container,
 .meal-grid{
@@ -521,6 +531,7 @@ header .logo i{
     display:flex;
     flex-direction:column;
     position:relative;
+    cursor:pointer;
 }
 
 .meal-card .thumb{
@@ -603,6 +614,101 @@ header .logo i{
     justify-content:space-between;
     margin-top:.6rem;
     gap:1rem;
+}
+
+/* meal detail modal — opens on card click */
+.meal-modal-backdrop{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.6);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    padding:10rem 2rem 4rem;
+    overflow-y:auto;
+    z-index:1500;
+}
+.meal-modal-backdrop.show{ display:flex; }
+.meal-modal{
+    background:var(--surface);
+    border:.1rem solid var(--border);
+    border-radius:1.2rem;
+    max-width:52rem;
+    width:100%;
+    overflow:hidden;
+    position:relative;
+}
+.meal-modal-close{
+    position:absolute;
+    top:1.4rem; right:1.4rem;
+    width:3.6rem; height:3.6rem;
+    border-radius:50%;
+    background:var(--surface-raised);
+    border:.1rem solid var(--border);
+    color:var(--text);
+    font-size:1.6rem;
+    cursor:pointer;
+    z-index:2;
+}
+.meal-modal-media{
+    height:26rem;
+    overflow:hidden;
+    background: linear-gradient(145deg, var(--surface-raised), var(--surface));
+    display:flex; align-items:center; justify-content:center;
+}
+.meal-modal-media img{ width:100%; height:100%; object-fit:cover; }
+.meal-modal-media .icon-fallback{
+    width:10rem; height:10rem;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:4rem;
+    color:#fff;
+    background: repeating-linear-gradient(135deg, var(--flame) 0 6px, var(--flame-dark) 6px 12px);
+}
+.meal-modal-body{ padding:2.6rem; }
+.meal-modal-body h3{
+    font-family: var(--font-display);
+    font-size:2.8rem;
+    letter-spacing:.04rem;
+    color:var(--text);
+    margin-bottom:.8rem;
+}
+.meal-modal-body p{
+    font-size:1.5rem;
+    color:var(--text-muted);
+    line-height:1.7;
+    margin:1.2rem 0 1.6rem;
+}
+.meal-modal-price{
+    font-family: var(--font-display);
+    font-size:2.2rem;
+    color:var(--flame);
+    margin-bottom:2rem;
+}
+.meal-modal-qty{
+    display:inline-flex;
+    align-items:center;
+    border:.1rem solid var(--border);
+    border-radius:.6rem;
+    overflow:hidden;
+    margin-bottom:2rem;
+}
+.meal-modal-qty button{
+    width:4.4rem; height:4.4rem;
+    background:var(--surface-raised);
+    color:var(--text);
+    font-size:1.8rem;
+    cursor:pointer;
+}
+.meal-modal-qty button:hover{ color:var(--flame); }
+.meal-modal-qty span{
+    width:5rem;
+    text-align:center;
+    font-weight:700;
+    font-size:1.6rem;
+}
+@media(max-width:768px){
+    .meal-modal-backdrop{ padding:6rem 1.4rem 2rem; }
+    .meal-modal-media{ height:20rem; }
 }
 
 /* ============================================
@@ -697,6 +803,11 @@ header .logo i{
 }
 .review-card .who strong{ display:block; font-size:1.5rem; color:var(--text); }
 .review-card .who span{ font-size:1.2rem; color:var(--text-muted); }
+
+.review-form-wrap{
+    max-width:56rem;
+    margin:4rem auto 0;
+}
 
 /* ============================================
    CART PAGE
@@ -1018,7 +1129,7 @@ footer{
 .footer-bottom a{ color:var(--flame); }
 
 /* ============================================
-   PAGE HERO
+   PAGE HERO (for menu/cart/checkout/orders/contact)
    ============================================ */
 .page-hero{
     padding:14rem 9% 4rem;
@@ -1030,9 +1141,7 @@ footer{
 .page-hero .eyebrow{ justify-content:center; }
 .page-hero .heading{ font-size:5.6rem; }
 
-/* ============================================
-   TOAST
-   ============================================ */
+/* toast for add-to-cart feedback */
 .toast{
     position:fixed;
     bottom:2.4rem; left:50%;

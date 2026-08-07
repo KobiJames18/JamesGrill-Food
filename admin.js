@@ -50,6 +50,7 @@ function showDashboard(){
     logoutBtn.style.display = 'inline-flex';
     loadOrders();
     loadMenuAdmin();
+    loadReviewsAdmin();
 }
 function showLoginError(msg){
     const el = document.getElementById('loginError');
@@ -91,6 +92,7 @@ document.querySelectorAll('.admin-tabs button').forEach(btn => {
         const tab = btn.getAttribute('data-tab');
         document.getElementById('ordersPanel').classList.toggle('active', tab === 'orders');
         document.getElementById('menuPanel').classList.toggle('active', tab === 'menu');
+        document.getElementById('reviewsPanel').classList.toggle('active', tab === 'reviews');
     });
 });
 
@@ -272,6 +274,82 @@ async function deleteItem(id){
 
 function slugify(text){
     return text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString().slice(-4);
+}
+
+/* ============================================
+   REVIEWS MANAGEMENT
+   ============================================ */
+function starsPlain(rating){
+    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+}
+
+async function loadReviewsAdmin(){
+    const list = document.getElementById('reviewsAdminList');
+    list.innerHTML = '<div class="empty-state small"><p>Loading reviews…</p></div>';
+
+    const { data, error } = await window.supabaseClient
+        .from('reviews')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error){
+        list.innerHTML = `<div class="empty-state small"><h3>Couldn't load reviews</h3><p>${error.message}</p></div>`;
+        return;
+    }
+
+    if (!data || data.length === 0){
+        list.innerHTML = `
+        <div class="empty-state small">
+            <i class="fa-solid fa-star"></i>
+            <h3>No reviews yet</h3>
+            <p>Reviews submitted on the site will show up here.</p>
+        </div>`;
+        return;
+    }
+
+    list.innerHTML = data.map(reviewAdminCardHTML).join('');
+
+    list.querySelectorAll('[data-approve]').forEach(btn => btn.addEventListener('click', () => setReviewApproval(btn.getAttribute('data-approve'), true)));
+    list.querySelectorAll('[data-unapprove]').forEach(btn => btn.addEventListener('click', () => setReviewApproval(btn.getAttribute('data-unapprove'), false)));
+    list.querySelectorAll('[data-delete-review]').forEach(btn => btn.addEventListener('click', () => deleteReview(btn.getAttribute('data-delete-review'))));
+}
+
+function reviewAdminCardHTML(r){
+    const statusBadge = r.approved
+        ? `<span class="order-status" style="background:rgba(76,201,120,.15); color:#4cc978;">Approved</span>`
+        : `<span class="order-status">Pending</span>`;
+    const actionBtn = r.approved
+        ? `<button class="btn small outline" data-unapprove="${r.id}">Unpublish</button>`
+        : `<button class="btn small" data-approve="${r.id}">Approve</button>`;
+    return `
+    <div class="order-admin-card">
+        <div class="order-admin-head">
+            <div class="meta">
+                <div><strong>${r.name}</strong>${r.location ? ' · ' + r.location : ''}</div>
+                <div>${new Date(r.created_at).toLocaleString()}</div>
+                <div style="color:var(--ember);">${starsPlain(r.rating)}</div>
+            </div>
+            ${statusBadge}
+        </div>
+        <p style="font-size:1.4rem; color:var(--text-muted); line-height:1.6; margin-bottom:1.6rem;">${r.message}</p>
+        <div style="display:flex; gap:.8rem; flex-wrap:wrap;">
+            ${actionBtn}
+            <button class="btn small outline" data-delete-review="${r.id}">Delete</button>
+        </div>
+    </div>`;
+}
+
+async function setReviewApproval(id, approved){
+    const { error } = await window.supabaseClient.from('reviews').update({ approved }).eq('id', id);
+    if (error){ alert('Could not update review: ' + error.message); return; }
+    loadReviewsAdmin();
+}
+
+async function deleteReview(id){
+    if (!confirm('Delete this review? This cannot be undone.')) return;
+    const { error } = await window.supabaseClient.from('reviews').delete().eq('id', id);
+    if (error){ alert('Could not delete review: ' + error.message); return; }
+    loadReviewsAdmin();
 }
 
 /* ============================================
