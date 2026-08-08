@@ -1,0 +1,35 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="flameGrad" x1="0%" y1="100%" x2="20%" y2="0%">
+      <stop offset="0%" stop-color="#d92e12"/>
+      <stop offset="55%" stop-color="#ff4426"/>
+      <stop offset="100%" stop-color="#ffb020"/>
+    </linearGradient>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2b1f17"/>
+      <stop offset="100%" stop-color="#150f0c"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="200" cy="200" r="192" fill="url(#badgeGrad)" stroke="#ff4426" stroke-width="5"/>
+
+  <g stroke="#f5ede4" stroke-opacity="0.16" stroke-width="7" stroke-linecap="round">
+    <line x1="95" y1="292" x2="305" y2="292"/>
+    <line x1="95" y1="316" x2="305" y2="316"/>
+    <line x1="95" y1="340" x2="305" y2="340"/>
+  </g>
+
+  <path d="M200,80
+           C160,125 143,163 160,202
+           C143,190 132,213 150,240
+           C122,223 110,262 143,290
+           C120,312 143,344 188,344
+           C154,332 160,304 188,292
+           C182,314 210,320 216,298
+           C233,315 267,298 256,265
+           C284,276 296,236 268,214
+           C290,208 284,174 256,168
+           C267,146 239,118 216,135
+           C222,101 200,80 200,80 Z"
+        fill="url(#flameGrad)"/>
+</svg>

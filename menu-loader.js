@@ -7,7 +7,7 @@
    ============================================ */
 window.MENU_ITEMS = [];
 window.CATEGORIES = [];
-
+ 
 function rowToMenuItem(row){
     return {
         id: row.id,
@@ -18,23 +18,24 @@ function rowToMenuItem(row){
         image: row.image,
         icon: row.icon,
         rating: row.rating,
-        badge: row.badge || undefined
+        badge: row.badge || undefined,
+        variants: row.variants || null
     };
 }
-
+ 
 async function loadMenuData(){
     try {
         if (!window.supabaseClient) throw new Error('Supabase not configured');
-
+ 
         const [itemsRes, catsRes] = await Promise.all([
             window.supabaseClient.from('menu_items').select('*').order('category'),
             window.supabaseClient.from('categories').select('*')
         ]);
-
+ 
         if (itemsRes.error) throw itemsRes.error;
         if (catsRes.error) throw catsRes.error;
         if (!itemsRes.data || itemsRes.data.length === 0) throw new Error('No menu items in database yet');
-
+ 
         window.MENU_ITEMS = itemsRes.data.map(rowToMenuItem);
         window.CATEGORIES = (catsRes.data && catsRes.data.length)
             ? catsRes.data.map(c => ({ id: c.id, label: c.label, icon: c.icon }))
@@ -45,3 +46,4 @@ async function loadMenuData(){
         window.CATEGORIES = DEFAULT_CATEGORIES;
     }
 }
+ 

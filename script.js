@@ -31,26 +31,31 @@ function unitPrice(item){
 function money(n){
     return 'Le ' + n.toLocaleString();
 }
+// two cart lines are "the same" only if both the item AND the chosen
+// variant match — this keeps e.g. Coca-Cola and Fanta as separate lines
+function sameLine(c, id, variant){
+    return c.id === id && (c.variant || null) === (variant || null);
+}
 
-function addToCart(id, qty = 1){
+function addToCart(id, qty = 1, variant = null){
     const cart = getCart();
-    const existing = cart.find(c => c.id === id);
+    const existing = cart.find(c => sameLine(c, id, variant));
     if(existing){ existing.qty += qty; }
-    else{ cart.push({ id, qty }); }
+    else{ cart.push({ id, qty, variant: variant || null }); }
     saveCart(cart);
     const item = findItem(id);
-    if(item) showToast(`${item.name} added to cart`);
+    if(item) showToast(`${item.name}${variant ? ' (' + variant + ')' : ''} added to cart`);
 }
-function removeFromCart(id){
-    saveCart(getCart().filter(c => c.id !== id));
+function removeFromCart(id, variant = null){
+    saveCart(getCart().filter(c => !sameLine(c, id, variant)));
     if(document.getElementById('cartItems')) renderCartPage();
 }
-function setQty(id, qty){
+function setQty(id, qty, variant = null){
     let cart = getCart();
     if(qty <= 0){
-        cart = cart.filter(c => c.id !== id);
+        cart = cart.filter(c => !sameLine(c, id, variant));
     } else {
-        const existing = cart.find(c => c.id === id);
+        const existing = cart.find(c => sameLine(c, id, variant));
         if(existing) existing.qty = qty;
     }
     saveCart(cart);
@@ -209,14 +214,24 @@ function renderGrid(container, items){
 
 function wireAddToCartButtons(root = document){
     root.querySelectorAll('[data-add-to-cart]').forEach(btn => {
-        btn.addEventListener('click', () => addToCart(btn.getAttribute('data-add-to-cart')));
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-add-to-cart');
+            const item = findItem(id);
+            // items with variants (e.g. drink flavors) can't be quick-added —
+            // open the modal instead so a flavor has to be chosen
+            if (item && item.variants && item.variants.length > 0){
+                openMealModal(id);
+            } else {
+                addToCart(id);
+            }
+        });
     });
 }
 
 /* ============================================
    MEAL DETAIL MODAL
    ============================================ */
-let mealModalState = { id: null, qty: 1 };
+let mealModalState = { id: null, qty: 1, variant: null };
 
 function ensureMealModal(){
     if (document.getElementById('mealModalBackdrop')) return;
@@ -233,6 +248,10 @@ function ensureMealModal(){
                 <div id="mealModalStars"></div>
                 <p id="mealModalDesc"></p>
                 <div class="meal-modal-price" id="mealModalPrice"></div>
+                <div class="field" id="mealModalVariantField" style="display:none;">
+                    <label for="mealModalVariant">Choose an option</label>
+                    <select id="mealModalVariant"></select>
+                </div>
                 <div class="meal-modal-qty">
                     <button id="mealModalQtyDown" aria-label="Decrease quantity">&minus;</button>
                     <span id="mealModalQtyValue">1</span>
@@ -255,8 +274,11 @@ function ensureMealModal(){
         mealModalState.qty++;
         document.getElementById('mealModalQtyValue').textContent = mealModalState.qty;
     });
+    document.getElementById('mealModalVariant').addEventListener('change', (e) => {
+        mealModalState.variant = e.target.value;
+    });
     document.getElementById('mealModalAddBtn').addEventListener('click', () => {
-        addToCart(mealModalState.id, mealModalState.qty);
+        addToCart(mealModalState.id, mealModalState.qty, mealModalState.variant);
         closeMealModal();
     });
 }
@@ -266,7 +288,8 @@ function openMealModal(id){
     if (!item) return;
     ensureMealModal();
 
-    mealModalState = { id, qty: 1 };
+    const hasVariants = item.variants && item.variants.length > 0;
+    mealModalState = { id, qty: 1, variant: hasVariants ? item.variants[0] : null };
 
     const media = document.getElementById('mealModalMedia');
     media.innerHTML = item.image
@@ -278,6 +301,16 @@ function openMealModal(id){
     document.getElementById('mealModalDesc').textContent = item.desc;
     document.getElementById('mealModalPrice').textContent = `${money(item.price[0])} – ${money(item.price[1])} per order`;
     document.getElementById('mealModalQtyValue').textContent = mealModalState.qty;
+
+    const variantField = document.getElementById('mealModalVariantField');
+    const variantSelect = document.getElementById('mealModalVariant');
+    if (hasVariants){
+        variantSelect.innerHTML = item.variants.map(v => `<option value="${v}">${v}</option>`).join('');
+        variantField.style.display = 'block';
+    } else {
+        variantSelect.innerHTML = '';
+        variantField.style.display = 'none';
+    }
 
     document.getElementById('mealModalBackdrop').classList.add('show');
 }
@@ -398,40 +431,44 @@ function renderCartPage(){
             const thumb = item.image
                 ? `<div class="thumb"><img src="${item.image}" alt="${item.name}"></div>`
                 : `<div class="thumb icon-fallback"><i class="fa-solid ${item.icon}"></i></div>`;
+            const variantAttr = c.variant || '';
+            const nameLine = c.variant ? `${item.name} <span class="unit-price">— ${c.variant}</span>` : item.name;
             return `
             <div class="cart-item">
                 ${thumb}
                 <div class="info">
-                    <h4>${item.name}</h4>
+                    <h4>${nameLine}</h4>
                     <span class="unit-price">${money(unitPrice(item))} each</span>
                 </div>
                 <div class="qty-control">
-                    <button data-qty-down="${item.id}">&minus;</button>
+                    <button data-qty-down="${item.id}" data-variant="${variantAttr}">&minus;</button>
                     <span>${c.qty}</span>
-                    <button data-qty-up="${item.id}">+</button>
+                    <button data-qty-up="${item.id}" data-variant="${variantAttr}">+</button>
                 </div>
                 <div class="line-total">${money(unitPrice(item) * c.qty)}</div>
-                <div class="remove" data-remove="${item.id}"><i class="fa-solid fa-trash"></i></div>
+                <div class="remove" data-remove="${item.id}" data-variant="${variantAttr}"><i class="fa-solid fa-trash"></i></div>
             </div>`;
         }).join('');
     }
 
     container.querySelectorAll('[data-qty-up]').forEach(btn => {
         const id = btn.getAttribute('data-qty-up');
+        const variant = btn.getAttribute('data-variant') || null;
         btn.addEventListener('click', () => {
-            const c = getCart().find(x => x.id === id);
-            setQty(id, (c ? c.qty : 0) + 1);
+            const c = getCart().find(x => sameLine(x, id, variant));
+            setQty(id, (c ? c.qty : 0) + 1, variant);
         });
     });
     container.querySelectorAll('[data-qty-down]').forEach(btn => {
         const id = btn.getAttribute('data-qty-down');
+        const variant = btn.getAttribute('data-variant') || null;
         btn.addEventListener('click', () => {
-            const c = getCart().find(x => x.id === id);
-            setQty(id, (c ? c.qty : 0) - 1);
+            const c = getCart().find(x => sameLine(x, id, variant));
+            setQty(id, (c ? c.qty : 0) - 1, variant);
         });
     });
     container.querySelectorAll('[data-remove]').forEach(btn => {
-        btn.addEventListener('click', () => removeFromCart(btn.getAttribute('data-remove')));
+        btn.addEventListener('click', () => removeFromCart(btn.getAttribute('data-remove'), btn.getAttribute('data-variant') || null));
     });
 
     const subtotal = cartTotal();
@@ -475,7 +512,8 @@ function initCheckoutPage(){
             summary.innerHTML = cart.map(c => {
                 const item = findItem(c.id);
                 if(!item) return '';
-                return `<div class="summary-row"><span>${item.name} x${c.qty}</span><span>${money(unitPrice(item) * c.qty)}</span></div>`;
+                const label = c.variant ? `${item.name} (${c.variant})` : item.name;
+                return `<div class="summary-row"><span>${label} x${c.qty}</span><span>${money(unitPrice(item) * c.qty)}</span></div>`;
             }).join('');
             const subtotal = cartTotal();
             const deliveryFee = 15;
@@ -485,10 +523,17 @@ function initCheckoutPage(){
         }
     }
 
+    let checkoutSubmitting = false;
+
     form.addEventListener('submit', (e) => {
         e.preventDefault();
+        if (checkoutSubmitting) return; // guard against double-click creating two orders
         const cartNow = getCart();
         if(cartNow.length === 0) return;
+
+        checkoutSubmitting = true;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
 
         const name = document.getElementById('coName').value.trim();
         const phone = document.getElementById('coPhone').value.trim();
@@ -502,7 +547,8 @@ function initCheckoutPage(){
             payment: payment ? payment.value : 'Cash on Delivery',
             items: cartNow.map(c => {
                 const item = findItem(c.id);
-                return { name: item.name, qty: c.qty, price: unitPrice(item) };
+                const name = c.variant ? `${item.name} (${c.variant})` : item.name;
+                return { name, qty: c.qty, price: unitPrice(item) };
             }),
             subtotal: cartTotal(),
             delivery: 15,
@@ -667,15 +713,21 @@ function initReviewForm(){
     const form = document.getElementById('reviewForm');
     if(!form) return;
     const msg = document.getElementById('reviewMsg');
+    let submitting = false;
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (submitting) return; // guard against double-click creating duplicate reviews
 
         if(!window.supabaseClient){
             msg.textContent = "Sorry, reviews aren't available right now.";
             msg.className = 'form-msg error show';
             return;
         }
+
+        submitting = true;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
 
         const name = document.getElementById('rvName').value.trim();
         const location = document.getElementById('rvLocation').value.trim();
@@ -685,6 +737,9 @@ function initReviewForm(){
         const { error } = await window.supabaseClient.from('reviews').insert({
             name, location: location || null, rating, message, approved: false
         });
+
+        submitting = false;
+        if (submitBtn) submitBtn.disabled = false;
 
         if(error){
             msg.textContent = "Something went wrong submitting your review. Please try again.";

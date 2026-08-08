@@ -236,6 +236,13 @@ header .logo i{
     color:var(--flame);
 }
 
+.logo-mark{
+    height:3.6rem;
+    width:3.6rem;
+    margin-right:.9rem;
+    flex-shrink:0;
+}
+
 .nav-wrap{
     display:flex;
     align-items:center;

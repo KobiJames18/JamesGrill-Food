@@ -77,7 +77,8 @@ const DEFAULT_MENU_ITEMS = [
     price: [20, 30],
     image: "images/cold drinks.jpg.jfif.jfif",
     icon: "fa-glass-water",
-    rating: 4
+    rating: 4,
+    variants: ["Coca-Cola", "Fanta", "Sprite", "Malta", "Bottled Water"]
   }
 ];
 
