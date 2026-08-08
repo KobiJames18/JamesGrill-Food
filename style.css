@@ -1232,3 +1232,5 @@ footer{
     .cart-item{ flex-wrap:wrap; }
     .cart-item .line-total{ text-align:left; }
 }
+
+ .logo-mark{ height:3.6rem; width:3.6rem; margin-right:.9rem; flex-shrink:0; }
