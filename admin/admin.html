@@ -7,12 +7,15 @@
     <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="../style.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16.png">
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
 <header>
-    <a href="../index.html" class="logo"><i class="fas fa-fire-flame-curved"></i>JamesGrill House <span style="font-family:var(--font-body); font-size:1.2rem; text-transform:uppercase; color:var(--text-muted); margin-left:1rem;">Admin</span></a>
+    <a href="../index.html" class="logo"><img src="../images/favicon-badge.jpg" alt="JamesGrill House logo" class="logo-mark"> JamesGrill House <span style="font-family:var(--font-body); font-size:1.2rem; text-transform:uppercase; color:var(--text-muted); margin-left:1rem;">Admin</span></a>
     <div class="header-actions">
         <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun"></i></button>
         <button class="btn small outline" id="logoutBtn" style="display:none;">Log Out</button>
@@ -136,6 +139,10 @@
             <div class="field">
                 <label for="itemRating">Rating (1–5)</label>
                 <input type="number" id="itemRating" min="1" max="5" value="4" required>
+            </div>
+            <div class="field">
+                <label for="itemVariants">Flavor/Type options (optional)</label>
+                <input type="text" id="itemVariants" placeholder="e.g. Coca-Cola, Fanta, Sprite, Bottled Water">
             </div>
             <div class="admin-modal-actions">
                 <button type="submit" class="btn block">Save Item</button>

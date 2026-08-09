@@ -218,6 +218,7 @@ function openItemModal(id){
         document.getElementById('itemImage').value = row.image || '';
         document.getElementById('itemIcon').value = row.icon || '';
         document.getElementById('itemRating').value = row.rating || 4;
+        document.getElementById('itemVariants').value = row.variants ? row.variants.join(', ') : '';
     } else {
         document.getElementById('itemModalTitle').textContent = 'Add Menu Item';
         document.getElementById('itemId').value = '';
@@ -229,14 +230,26 @@ function closeItemModal(){
     modalBackdrop.classList.remove('show');
 }
 
+let itemFormSubmitting = false;
+
 itemForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (itemFormSubmitting) return; // guard against double-click creating duplicate items
     const errEl = document.getElementById('itemFormError');
     errEl.classList.remove('show');
+
+    itemFormSubmitting = true;
+    const saveBtn = itemForm.querySelector('button[type="submit"]');
+    if (saveBtn) saveBtn.disabled = true;
 
     const existingId = document.getElementById('itemId').value;
     const name = document.getElementById('itemName').value.trim();
     const id = existingId || slugify(name);
+
+    const variantsRaw = document.getElementById('itemVariants').value.trim();
+    const variants = variantsRaw
+        ? variantsRaw.split(',').map(v => v.trim()).filter(Boolean)
+        : null;
 
     const record = {
         id,
@@ -248,10 +261,15 @@ itemForm.addEventListener('submit', async (e) => {
         image: document.getElementById('itemImage').value.trim() || null,
         icon: document.getElementById('itemIcon').value.trim() || null,
         rating: Number(document.getElementById('itemRating').value),
-        badge: document.getElementById('itemBadge').value.trim() || null
+        badge: document.getElementById('itemBadge').value.trim() || null,
+        variants: variants
     };
 
     const { error } = await window.supabaseClient.from('menu_items').upsert(record);
+
+    itemFormSubmitting = false;
+    if (saveBtn) saveBtn.disabled = false;
+
     if (error){
         errEl.textContent = error.message;
         errEl.classList.add('show');
