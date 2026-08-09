@@ -31,6 +31,11 @@ function unitPrice(item){
 function money(n){
     return 'Le ' + n.toLocaleString();
 }
+function generateOrderId(){
+    const ts = Date.now().toString().slice(-6);
+    const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
+    return `JGH-${ts}${rand}`;
+}
 // two cart lines are "the same" only if both the item AND the chosen
 // variant match — this keeps e.g. Coca-Cola and Fanta as separate lines
 function sameLine(c, id, variant){
@@ -541,7 +546,7 @@ function initCheckoutPage(){
         const payment = form.querySelector('input[name="payment"]:checked');
 
         const order = {
-            id: 'TG-' + Date.now().toString().slice(-6),
+            id: generateOrderId(),
             date: new Date().toISOString(),
             name, phone, address,
             payment: payment ? payment.value : 'Cash on Delivery',
@@ -625,6 +630,39 @@ async function initOrdersPage(){
     }
 }
 
+let cancelInProgress = false;
+
+async function cancelOrder(id, btn){
+    if (cancelInProgress) return;
+    if (!confirm('Cancel this order? This cannot be undone.')) return;
+    if (!window.supabaseClient){
+        alert("Sorry, cancellation isn't available right now. Please try again shortly.");
+        return;
+    }
+
+    cancelInProgress = true;
+    if (btn) btn.disabled = true;
+
+    const { error } = await window.supabaseClient
+        .from('orders')
+        .update({ status: 'Cancelled' })
+        .eq('id', id)
+        .eq('status', 'Processing');
+
+    cancelInProgress = false;
+
+    if (error){
+        alert('Could not cancel this order: ' + error.message);
+        if (btn) btn.disabled = false;
+        return;
+    }
+
+    // keep the local copy (customer's own order history) in sync too
+    const orders = getOrders().map(o => o.id === id ? { ...o, status: 'Cancelled' } : o);
+    saveOrders(orders);
+    renderOrdersList(orders);
+}
+
 function renderOrdersList(orders){
     const list = document.getElementById('ordersList');
     if(!list) return;
@@ -652,7 +690,12 @@ function renderOrdersList(orders){
             ${o.items.map(it => `<div class="order-line"><span>${it.name} x${it.qty}</span><span>${money(it.price * it.qty)}</span></div>`).join('')}
             <div class="order-line" style="margin-top:1rem; padding-top:1rem; border-top:.1rem dashed var(--border);"><span>Delivery</span><span>${money(o.delivery)}</span></div>
             <div class="order-line"><strong>Total</strong><strong>${money(o.total)}</strong></div>
+            ${o.status === 'Processing' ? `<button class="btn small outline" style="margin-top:1.4rem;" data-cancel-order="${o.id}">Cancel Order</button>` : ''}
         </div>`).join('');
+
+    list.querySelectorAll('[data-cancel-order]').forEach(btn => {
+        btn.addEventListener('click', () => cancelOrder(btn.getAttribute('data-cancel-order'), btn));
+    });
 }
 
 /* ============================================
