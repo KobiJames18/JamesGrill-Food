@@ -32,8 +32,12 @@ function money(n){
     return 'Le ' + n.toLocaleString();
 }
 function generateOrderId(){
-    const ts = Date.now().toString().slice(-6);
-    const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
+    // Full timestamp (not truncated) + 6 random base36 chars, so two orders
+    // placed in the same millisecond from different phones still get a
+    // practically-impossible-to-collide ID (36^6 = ~2.2 billion combinations
+    // per millisecond, on top of the timestamp already being unique per ms).
+    const ts = Date.now().toString(36).toUpperCase();
+    const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
     return `JGH-${ts}${rand}`;
 }
 // two cart lines are "the same" only if both the item AND the chosen
