@@ -30,12 +30,13 @@
         <form id="loginForm">
             <div class="field">
                 <label for="loginEmail">Email</label>
-                <input type="email" id="loginEmail" required placeholder="you@jamesgrillhouse.com">
+                <input type="email" id="loginEmail" required maxlength="254" autocomplete="username" placeholder="you@jamesgrillhouse.com">
             </div>
             <div class="field">
                 <label for="loginPassword">Password</label>
-                <input type="password" id="loginPassword" required placeholder="••••••••">
+                <input type="password" id="loginPassword" required maxlength="128" autocomplete="current-password" placeholder="••••••••">
             </div>
+            <div class="cf-turnstile" id="turnstileWidget" data-sitekey="0x4AAAAAAEM_W1SSokbkDqtf" data-callback="onTurnstileVerified" data-theme="auto" style="margin-bottom:1.6rem;"></div>
             <button type="submit" class="btn block">Log In <i class="fa-solid fa-arrow-right-to-bracket"></i></button>
             <div class="admin-error" id="loginError"></div>
         </form>
@@ -153,6 +154,7 @@
     </div>
 </div>
 
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../supabase-client.js"></script>
 <script src="admin.js"></script>

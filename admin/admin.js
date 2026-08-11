@@ -19,6 +19,20 @@ function updateAdminThemeIcon(theme){
 
 function money(n){ return 'Le ' + Number(n).toLocaleString(); }
 
+// escapes customer-supplied text (order details, review text) before it's
+// inserted via innerHTML in the admin dashboard — without this, a
+// malicious order or review could run a script inside the admin's
+// logged-in session the moment this data is displayed (stored XSS)
+function escapeHtml(str){
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 /* ============================================
    AUTH
    ============================================ */
@@ -43,6 +57,7 @@ function showLogin(){
     loginSection.style.display = 'block';
     dashboardSection.style.display = 'none';
     logoutBtn.style.display = 'none';
+    if (isLockedOut()) updateLoginUIForLockout();
 }
 function showDashboard(){
     loginSection.style.display = 'none';
@@ -58,23 +73,131 @@ function showLoginError(msg){
     el.classList.add('show');
 }
 
+/* ============================================
+   LOGIN THROTTLING (client-side deterrent)
+   Slows down repeated failed attempts from this browser. This is a UX
+   deterrent, not real rate limiting — anyone calling the Supabase API
+   directly (bypassing this page entirely) isn't affected by it. Supabase
+   itself applies baseline rate limits to the auth endpoint regardless.
+   For real brute-force protection, enable CAPTCHA on Auth in the
+   Supabase dashboard (Authentication → Settings → Bot and Abuse
+   Protection) — that's enforced server-side and can't be bypassed by
+   skipping this page.
+   ============================================ */
+const THROTTLE_KEY = 'jamesgrill_admin_login_throttle';
+const LOCKOUT_THRESHOLD = 5; // start locking out after this many failures in a row
+
+function getThrottleState(){
+    try{
+        return JSON.parse(localStorage.getItem(THROTTLE_KEY)) || { count: 0, lockUntil: null };
+    } catch(e){
+        return { count: 0, lockUntil: null };
+    }
+}
+function saveThrottleState(state){
+    localStorage.setItem(THROTTLE_KEY, JSON.stringify(state));
+}
+function resetThrottle(){
+    localStorage.removeItem(THROTTLE_KEY);
+}
+function remainingLockSeconds(){
+    const state = getThrottleState();
+    if (!state.lockUntil) return 0;
+    return Math.max(0, Math.ceil((state.lockUntil - Date.now()) / 1000));
+}
+function isLockedOut(){
+    return remainingLockSeconds() > 0;
+}
+function recordFailedAttempt(){
+    const state = getThrottleState();
+    state.count += 1;
+    if (state.count >= LOCKOUT_THRESHOLD){
+        // escalating cooldown: 30s, 60s, 2min, 4min, capped at 5min
+        const tier = state.count - LOCKOUT_THRESHOLD;
+        const seconds = Math.min(300, 30 * Math.pow(2, tier));
+        state.lockUntil = Date.now() + seconds * 1000;
+    }
+    saveThrottleState(state);
+}
+
+let lockoutTimer = null;
+function updateLoginUIForLockout(){
+    const submitBtn = document.querySelector('#loginForm button[type="submit"]');
+    const seconds = remainingLockSeconds();
+    if (seconds > 0){
+        if (submitBtn) submitBtn.disabled = true;
+        showLoginError(`Too many failed attempts. Try again in ${seconds}s.`);
+        clearTimeout(lockoutTimer);
+        lockoutTimer = setTimeout(updateLoginUIForLockout, 1000);
+    } else {
+        if (submitBtn) submitBtn.disabled = false;
+    }
+}
+
+/* ============================================
+   INPUT VALIDATION
+   ============================================ */
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateLoginInput(email, password){
+    if (!email || !EMAIL_PATTERN.test(email)){
+        return 'Please enter a valid email address.';
+    }
+    if (!password){
+        return 'Please enter your password.';
+    }
+    return null;
+}
+
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
     const errEl = document.getElementById('loginError');
     errEl.classList.remove('show');
+
+    if (isLockedOut()){
+        updateLoginUIForLockout();
+        return;
+    }
+
+    // clean and cap input before it goes anywhere near Supabase — trims
+    // stray whitespace and enforces sane length limits (email/password
+    // inputs also carry maxlength in the HTML as a first line of defense)
+    const email = document.getElementById('loginEmail').value.trim().slice(0, 254);
+    const password = document.getElementById('loginPassword').value.slice(0, 128);
+
+    const validationError = validateLoginInput(email, password);
+    if (validationError){
+        showLoginError(validationError);
+        return;
+    }
 
     if (!window.supabaseClient){
         showLoginError('Supabase is not configured yet. Fill in supabase-client.js with your project URL and anon key.');
         return;
     }
 
+    const submitBtn = document.querySelector('#loginForm button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
     const { error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+
+    if (submitBtn) submitBtn.disabled = false;
+
     if (error){
-        showLoginError(error.message);
+        recordFailedAttempt();
+        // deliberately generic: never reveal whether the email exists,
+        // whether it's unconfirmed, or whether it was the password that
+        // was wrong — all credential failures show the same message so
+        // an attacker can't use the response to enumerate valid accounts.
+        // A genuine connectivity problem still gets its own honest message.
+        const isNetworkIssue = !error.status && /fetch|network/i.test(error.message || '');
+        showLoginError(isNetworkIssue
+            ? "Couldn't reach the server. Check your connection and try again."
+            : 'Incorrect email or password.');
+        if (isLockedOut()) updateLoginUIForLockout();
         return;
     }
+    resetThrottle();
     showDashboard();
 });
 
@@ -133,18 +256,18 @@ async function loadOrders(){
 }
 
 function orderCardHTML(o){
-    const items = (o.items || []).map(it => `<div class="order-line"><span>${it.name} x${it.qty}</span><span>${money(it.price * it.qty)}</span></div>`).join('');
+    const items = (o.items || []).map(it => `<div class="order-line"><span>${escapeHtml(it.name)} x${it.qty}</span><span>${money(it.price * it.qty)}</span></div>`).join('');
     const statusOptions = STATUS_OPTIONS.map(s => `<option value="${s}" ${s === o.status ? 'selected' : ''}>${s}</option>`).join('');
     return `
     <div class="order-admin-card">
         <div class="order-admin-head">
             <div class="meta">
-                <div><strong>${o.id}</strong> — ${new Date(o.created_at).toLocaleString()}</div>
-                <div><strong>${o.customer_name || '—'}</strong> · ${o.customer_phone || '—'}</div>
-                <div>${o.address || '—'}</div>
-                <div>${o.payment_method || '—'}</div>
+                <div><strong>${escapeHtml(o.id)}</strong> — ${new Date(o.created_at).toLocaleString()}</div>
+                <div><strong>${escapeHtml(o.customer_name || '—')}</strong> · ${escapeHtml(o.customer_phone || '—')}</div>
+                <div>${escapeHtml(o.address || '—')}</div>
+                <div>${escapeHtml(o.payment_method || '—')}</div>
             </div>
-            <select class="status-select" data-status-order="${o.id}">${statusOptions}</select>
+            <select class="status-select" data-status-order="${escapeHtml(o.id)}">${statusOptions}</select>
         </div>
         ${items}
         <div class="order-line" style="margin-top:1rem; padding-top:1rem; border-top:.1rem dashed var(--border);"><span>Delivery</span><span>${money(o.delivery)}</span></div>
@@ -182,14 +305,14 @@ async function loadMenuAdmin(){
 
     tbody.innerHTML = currentMenuRows.map(row => `
         <tr>
-            <td>${row.name}</td>
-            <td>${row.category}</td>
+            <td>${escapeHtml(row.name)}</td>
+            <td>${escapeHtml(row.category)}</td>
             <td>${money(row.price_min)} – ${money(row.price_max)}</td>
-            <td>${row.badge || '—'}</td>
+            <td>${escapeHtml(row.badge || '—')}</td>
             <td>
                 <div class="row-actions">
-                    <button data-edit="${row.id}" aria-label="Edit"><i class="fa-solid fa-pen"></i></button>
-                    <button data-delete="${row.id}" aria-label="Delete"><i class="fa-solid fa-trash"></i></button>
+                    <button data-edit="${escapeHtml(row.id)}" aria-label="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button data-delete="${escapeHtml(row.id)}" aria-label="Delete"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </td>
         </tr>`).join('');
@@ -337,22 +460,22 @@ function reviewAdminCardHTML(r){
         ? `<span class="order-status" style="background:rgba(76,201,120,.15); color:#4cc978;">Approved</span>`
         : `<span class="order-status">Pending</span>`;
     const actionBtn = r.approved
-        ? `<button class="btn small outline" data-unapprove="${r.id}">Unpublish</button>`
-        : `<button class="btn small" data-approve="${r.id}">Approve</button>`;
+        ? `<button class="btn small outline" data-unapprove="${escapeHtml(r.id)}">Unpublish</button>`
+        : `<button class="btn small" data-approve="${escapeHtml(r.id)}">Approve</button>`;
     return `
     <div class="order-admin-card">
         <div class="order-admin-head">
             <div class="meta">
-                <div><strong>${r.name}</strong>${r.location ? ' · ' + r.location : ''}</div>
+                <div><strong>${escapeHtml(r.name)}</strong>${r.location ? ' · ' + escapeHtml(r.location) : ''}</div>
                 <div>${new Date(r.created_at).toLocaleString()}</div>
                 <div style="color:var(--ember);">${starsPlain(r.rating)}</div>
             </div>
             ${statusBadge}
         </div>
-        <p style="font-size:1.4rem; color:var(--text-muted); line-height:1.6; margin-bottom:1.6rem;">${r.message}</p>
+        <p style="font-size:1.4rem; color:var(--text-muted); line-height:1.6; margin-bottom:1.6rem;">${escapeHtml(r.message)}</p>
         <div style="display:flex; gap:.8rem; flex-wrap:wrap;">
             ${actionBtn}
-            <button class="btn small outline" data-delete-review="${r.id}">Delete</button>
+            <button class="btn small outline" data-delete-review="${escapeHtml(r.id)}">Delete</button>
         </div>
     </div>`;
 }
