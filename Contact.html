@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JamesGrill House Food Made With Love</title>
-    <meta name="description" content="Flame-grilled chicken, goat meat, shawarma and more. Order online from JamesGrill House.">
-
+    <title>Contact Us JamesGrill House</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
@@ -14,16 +12,14 @@
 </head>
 <body>
 
-<!-- header -->
 <header>
     <a href="index.html" class="logo"><img src="images/favicon-badge.jpg" alt="JamesGrill House logo" class="logo-mark">JamesGrill House</a>
 
     <div class="nav-wrap">
         <nav class="navbar">
-            <a href="index.html" class="active">Home</a>
-            <a href="menu.html#speciality">Speciality</a>
+            <a href="index.html">Home</a>
             <a href="menu.html">Menu</a>
-            <a href="contact.html">Contact</a>
+            <a href="contact.html" class="active">Contact</a>
         </nav>
 
         <div class="header-actions">
@@ -45,99 +41,53 @@
     </form>
 </header>
 
-<!-- hero -->
-<section class="hero" id="home">
-    <div class="hero-grid">
-        <div class="content">
-            <span class="eyebrow">Flame Grilled Daily</span>
-            <h1>Food made <span>with love</span></h1>
-            <p>Welcome to JamesGrill House, where every flame tells a story and every bite brings joy. We don't just serve food we serve passion, flavor, and memories.</p>
-            <div class="hero-cta">
-                <a href="menu.html" class="btn">Order Now <i class="fa-solid fa-arrow-right"></i></a>
-                <a href="#speciality" class="btn outline">See Speciality</a>
+<section class="page-hero">
+    <span class="eyebrow">We'd Love To Hear From You</span>
+    <h1 class="heading">Contact <span>us</span></h1>
+</section>
+
+<section>
+    <div class="contact-layout">
+        <div class="contact-info">
+            <div class="item">
+                <i class="fa-solid fa-location-dot"></i>
+                <div><h4>Visit Us</h4><p>5 Rokel Container, Freetown, Sierra Leone</p></div>
             </div>
-            <div class="hero-stats">
-                <div><strong>7+</strong><span>Signature Dishes</span></div>
-                <div><strong>15 min</strong><span>Avg. Grill Time</span></div>
+            <div class="item">
+                <i class="fa-solid fa-phone"></i>
+                <div><h4>Call Us</h4><p>+232 34810013</p></div>
+            </div>
+            <div class="item">
+                <i class="fa-solid fa-envelope"></i>
+                <div><h4>Gmail Us</h4><p>kobirobert3000@gmail.com</p></div>
+            </div>
+            <div class="item">
+                <i class="fa-solid fa-clock"></i>
+                <div><h4>Opening Hours</h4><p>Mon – Sun: 10:00am – 11:00pm</p></div>
             </div>
         </div>
 
-        <div class="visual">
-            <div class="ring"></div>
-            <div class="plate">
-                <img src="images/goatmeat.jpg.jfif.jfif" alt="Flame grilled chicken fresh off the grill">
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- popular categories -->
-<section class="categories" id="speciality">
-    <div class="section-head">
-        <span class="eyebrow">Browse</span>
-        <h1 class="heading">Popular <span>categories</span></h1>
-        <p class="sub">Everything on the menu, sorted the way you actually order it.</p>
-    </div>
-    <div class="box-container" id="categoryGrid"></div>
-</section>
-
-<!-- featured meals -->
-<section class="popular" id="popular">
-    <div class="section-head">
-        <span class="eyebrow">Fan Favourites</span>
-        <h1 class="heading">Featured <span>meals</span></h1>
-        <p class="sub">The dishes our regulars order again and again.</p>
-    </div>
-    <div class="box-container" id="featuredGrid"></div>
-    <div style="text-align:center; margin-top:3.5rem;">
-    <a href="menu.html" class="btn outline">View Full Menu <i class="fa-solid fa-utensils"></i></a>
-</section>
-
-<!-- reviews -->
-<section class="reviews" id="review">
-    <div class="section-head">
-        <span class="eyebrow">Word On The Street</span>
-        <h1 class="heading">What people <span>are saying</span></h1>
-    </div>
-    <div class="box-container" id="reviewsGrid"></div>
-
-    <div class="review-form-wrap">
         <div class="form-card">
-            <h3 style="font-family:var(--font-display); font-size:2.2rem; letter-spacing:.04rem; color:var(--text); margin-bottom:.6rem;">Leave a Review</h3>
-            <p class="sub" style="margin:0 0 2rem;">Your review will appear here once we approve it.</p>
-            <form id="reviewForm">
-                <div class="field-row">
-                    <div class="field">
-                        <label for="rvName">Name</label>
-                        <input type="text" id="rvName" required placeholder="Your name">
-                    </div>
-                    <div class="field">
-                        <label for="rvLocation">Location (optional)</label>
-                        <input type="text" id="rvLocation" placeholder="e.g. Freetown">
-                    </div>
+            <form id="contactForm">
+                <div class="field">
+                    <label for="cName">Name</label>
+                    <input type="text" id="cName" required placeholder="Your name">
                 </div>
                 <div class="field">
-                    <label for="rvRating">Rating</label>
-                    <select id="rvRating" required>
-                        <option value="5">5 — Excellent</option>
-                        <option value="4">4 — Great</option>
-                        <option value="3">3 — Good</option>
-                        <option value="2">2 — Okay</option>
-                        <option value="1">1 — Poor</option>
-                    </select>
+                    <label for="cEmail">Email</label>
+                    <input type="email" id="cEmail" required placeholder="kobi@example.com">
                 </div>
                 <div class="field">
-                    <label for="rvMessage">Your Review</label>
-                    <textarea id="rvMessage" required placeholder="Tell us about your experience"></textarea>
+                    <label for="cMessage">Message</label>
+                    <textarea id="cMessage" required placeholder="How can we help?"></textarea>
                 </div>
-                <button type="submit" class="btn block">Submit Review <i class="fa-solid fa-paper-plane"></i></button>
-                <div class="form-msg" id="reviewMsg"></div>
+                <button type="submit" class="btn block">Send Message <i class="fa-solid fa-paper-plane"></i></button>
+                <div class="form-msg" id="contactMsg"></div>
             </form>
         </div>
     </div>
 </section>
 
-<!-- footer -->
 <footer>
     <div class="footer-grid">
         <div>

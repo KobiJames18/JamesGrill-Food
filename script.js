@@ -31,13 +31,21 @@ function unitPrice(item){
 function money(n){
     return 'Le ' + n.toLocaleString();
 }
+// escapes user-supplied text before it's inserted via innerHTML, so a
+// review, name, or address containing HTML/script can't run in the
+// browser of anyone viewing it (stored XSS prevention)
+function escapeHtml(str){
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 function generateOrderId(){
-    // Full timestamp (not truncated) + 6 random base36 chars, so two orders
-    // placed in the same millisecond from different phones still get a
-    // practically-impossible-to-collide ID (36^6 = ~2.2 billion combinations
-    // per millisecond, on top of the timestamp already being unique per ms).
-    const ts = Date.now().toString(36).toUpperCase();
-    const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+    const ts = Date.now().toString().slice(-6);
+    const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
     return `JGH-${ts}${rand}`;
 }
 // two cart lines are "the same" only if both the item AND the chosen
@@ -136,15 +144,21 @@ function initMobileMenu(){
     const navbar = document.querySelector('.navbar');
     if(!menu || !navbar) return;
 
-    menu.addEventListener('click', () => {
+    const toggleMenu = () => {
         const isOpen = navbar.classList.toggle('active');
         menu.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+        menu.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    };
+    menu.addEventListener('click', toggleMenu);
+    menu.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleMenu(); }
     });
 
     window.addEventListener('scroll', () => {
         if(navbar.classList.contains('active')){
             navbar.classList.remove('active');
             menu.innerHTML = '<i class="fa-solid fa-bars"></i>';
+            menu.setAttribute('aria-expanded', 'false');
         }
     });
 }
@@ -185,23 +199,23 @@ function starsHTML(rating){
 
 function mealCardHTML(item){
     const thumb = item.image
-        ? `<img src="${item.image}" alt="${item.name}">`
-        : `<div class="icon-fallback"><i class="fa-solid ${item.icon}"></i></div>`;
-    const badge = item.badge ? `<span class="badge">${item.badge}</span>` : '';
+        ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}">`
+        : `<div class="icon-fallback"><i class="fa-solid ${escapeHtml(item.icon)}"></i></div>`;
+    const badge = item.badge ? `<span class="badge">${escapeHtml(item.badge)}</span>` : '';
     return `
-    <div class="meal-card" data-id="${item.id}" data-category="${item.category}" data-name="${item.name.toLowerCase()}">
+    <div class="meal-card" data-id="${escapeHtml(item.id)}" data-category="${escapeHtml(item.category)}" data-name="${escapeHtml(item.name.toLowerCase())}">
         <div class="thumb">
             ${thumb}
             <span class="price-tag">${money(item.price[0])} - ${money(item.price[1])}</span>
             ${badge}
         </div>
         <div class="body">
-            <h3>${item.name}</h3>
+            <h3>${escapeHtml(item.name)}</h3>
             ${starsHTML(item.rating)}
-            <p>${item.desc}</p>
+            <p>${escapeHtml(item.desc)}</p>
             <div class="foot">
                 <span class="unit-price">${money(unitPrice(item))} / order</span>
-                <button class="btn small" data-add-to-cart="${item.id}"><i class="fa-solid fa-cart-plus"></i> Add</button>
+                <button class="btn small" data-add-to-cart="${escapeHtml(item.id)}"><i class="fa-solid fa-cart-plus"></i> Add</button>
             </div>
         </div>
     </div>`;
@@ -302,8 +316,8 @@ function openMealModal(id){
 
     const media = document.getElementById('mealModalMedia');
     media.innerHTML = item.image
-        ? `<img src="${item.image}" alt="${item.name}">`
-        : `<div class="icon-fallback"><i class="fa-solid ${item.icon}"></i></div>`;
+        ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}">`
+        : `<div class="icon-fallback"><i class="fa-solid ${escapeHtml(item.icon)}"></i></div>`;
 
     document.getElementById('mealModalName').textContent = item.name;
     document.getElementById('mealModalStars').innerHTML = starsHTML(item.rating);
@@ -314,7 +328,7 @@ function openMealModal(id){
     const variantField = document.getElementById('mealModalVariantField');
     const variantSelect = document.getElementById('mealModalVariant');
     if (hasVariants){
-        variantSelect.innerHTML = item.variants.map(v => `<option value="${v}">${v}</option>`).join('');
+        variantSelect.innerHTML = item.variants.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
         variantField.style.display = 'block';
     } else {
         variantSelect.innerHTML = '';
@@ -438,10 +452,10 @@ function renderCartPage(){
             const item = findItem(c.id);
             if(!item) return '';
             const thumb = item.image
-                ? `<div class="thumb"><img src="${item.image}" alt="${item.name}"></div>`
-                : `<div class="thumb icon-fallback"><i class="fa-solid ${item.icon}"></i></div>`;
-            const variantAttr = c.variant || '';
-            const nameLine = c.variant ? `${item.name} <span class="unit-price">— ${c.variant}</span>` : item.name;
+                ? `<div class="thumb"><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}"></div>`
+                : `<div class="thumb icon-fallback"><i class="fa-solid ${escapeHtml(item.icon)}"></i></div>`;
+            const variantAttr = escapeHtml(c.variant || '');
+            const nameLine = c.variant ? `${escapeHtml(item.name)} <span class="unit-price">— ${escapeHtml(c.variant)}</span>` : escapeHtml(item.name);
             return `
             <div class="cart-item">
                 ${thumb}
@@ -450,12 +464,12 @@ function renderCartPage(){
                     <span class="unit-price">${money(unitPrice(item))} each</span>
                 </div>
                 <div class="qty-control">
-                    <button data-qty-down="${item.id}" data-variant="${variantAttr}">&minus;</button>
+                    <button data-qty-down="${escapeHtml(item.id)}" data-variant="${variantAttr}" aria-label="Decrease quantity">&minus;</button>
                     <span>${c.qty}</span>
-                    <button data-qty-up="${item.id}" data-variant="${variantAttr}">+</button>
+                    <button data-qty-up="${escapeHtml(item.id)}" data-variant="${variantAttr}" aria-label="Increase quantity">+</button>
                 </div>
                 <div class="line-total">${money(unitPrice(item) * c.qty)}</div>
-                <div class="remove" data-remove="${item.id}" data-variant="${variantAttr}"><i class="fa-solid fa-trash"></i></div>
+                <div class="remove" data-remove="${escapeHtml(item.id)}" data-variant="${variantAttr}" role="button" tabindex="0" aria-label="Remove item"><i class="fa-solid fa-trash"></i></div>
             </div>`;
         }).join('');
     }
@@ -477,7 +491,11 @@ function renderCartPage(){
         });
     });
     container.querySelectorAll('[data-remove]').forEach(btn => {
-        btn.addEventListener('click', () => removeFromCart(btn.getAttribute('data-remove'), btn.getAttribute('data-variant') || null));
+        const doRemove = () => removeFromCart(btn.getAttribute('data-remove'), btn.getAttribute('data-variant') || null);
+        btn.addEventListener('click', doRemove);
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); doRemove(); }
+        });
     });
 
     const subtotal = cartTotal();
@@ -521,7 +539,7 @@ function initCheckoutPage(){
             summary.innerHTML = cart.map(c => {
                 const item = findItem(c.id);
                 if(!item) return '';
-                const label = c.variant ? `${item.name} (${c.variant})` : item.name;
+                const label = c.variant ? `${escapeHtml(item.name)} (${escapeHtml(c.variant)})` : escapeHtml(item.name);
                 return `<div class="summary-row"><span>${label} x${c.qty}</span><span>${money(unitPrice(item) * c.qty)}</span></div>`;
             }).join('');
             const subtotal = cartTotal();
@@ -691,7 +709,7 @@ function renderOrdersList(orders){
                 </div>
                 <span class="order-status">${o.status}</span>
             </div>
-            ${o.items.map(it => `<div class="order-line"><span>${it.name} x${it.qty}</span><span>${money(it.price * it.qty)}</span></div>`).join('')}
+            ${o.items.map(it => `<div class="order-line"><span>${escapeHtml(it.name)} x${it.qty}</span><span>${money(it.price * it.qty)}</span></div>`).join('')}
             <div class="order-line" style="margin-top:1rem; padding-top:1rem; border-top:.1rem dashed var(--border);"><span>Delivery</span><span>${money(o.delivery)}</span></div>
             <div class="order-line"><strong>Total</strong><strong>${money(o.total)}</strong></div>
             ${o.status === 'Processing' ? `<button class="btn small outline" style="margin-top:1.4rem;" data-cancel-order="${o.id}">Cancel Order</button>` : ''}
@@ -724,10 +742,10 @@ function reviewCardHTML(r){
     return `
     <div class="review-card">
         ${starsHTML(r.rating)}
-        <p>${r.message}</p>
+        <p>${escapeHtml(r.message)}</p>
         <div class="who">
-            <div class="avatar">${r.name.charAt(0).toUpperCase()}</div>
-            <div><strong>${r.name}</strong><span>${r.location || ''}</span></div>
+            <div class="avatar">${escapeHtml(r.name.charAt(0).toUpperCase())}</div>
+            <div><strong>${escapeHtml(r.name)}</strong><span>${escapeHtml(r.location || '')}</span></div>
         </div>
     </div>`;
 }

@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JamesGrill House Food Made With Love</title>
-    <meta name="description" content="Flame-grilled chicken, goat meat, shawarma and more. Order online from JamesGrill House.">
-
+    <title>Checkout JamesGrill House</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
@@ -14,14 +12,12 @@
 </head>
 <body>
 
-<!-- header -->
 <header>
     <a href="index.html" class="logo"><img src="images/favicon-badge.jpg" alt="JamesGrill House logo" class="logo-mark">JamesGrill House</a>
 
     <div class="nav-wrap">
         <nav class="navbar">
-            <a href="index.html" class="active">Home</a>
-            <a href="menu.html#speciality">Speciality</a>
+            <a href="index.html">Home</a>
             <a href="menu.html">Menu</a>
             <a href="contact.html">Contact</a>
         </nav>
@@ -45,99 +41,63 @@
     </form>
 </header>
 
-<!-- hero -->
-<section class="hero" id="home">
-    <div class="hero-grid">
-        <div class="content">
-            <span class="eyebrow">Flame Grilled Daily</span>
-            <h1>Food made <span>with love</span></h1>
-            <p>Welcome to JamesGrill House, where every flame tells a story and every bite brings joy. We don't just serve food we serve passion, flavor, and memories.</p>
-            <div class="hero-cta">
-                <a href="menu.html" class="btn">Order Now <i class="fa-solid fa-arrow-right"></i></a>
-                <a href="#speciality" class="btn outline">See Speciality</a>
-            </div>
-            <div class="hero-stats">
-                <div><strong>7+</strong><span>Signature Dishes</span></div>
-                <div><strong>15 min</strong><span>Avg. Grill Time</span></div>
-            </div>
-        </div>
-
-        <div class="visual">
-            <div class="ring"></div>
-            <div class="plate">
-                <img src="images/goatmeat.jpg.jfif.jfif" alt="Flame grilled chicken fresh off the grill">
-            </div>
-        </div>
-    </div>
+<section class="page-hero">
+    <span class="eyebrow">Almost There</span>
+    <h1 class="heading">Checkout</h1>
 </section>
 
-<!-- popular categories -->
-<section class="categories" id="speciality">
-    <div class="section-head">
-        <span class="eyebrow">Browse</span>
-        <h1 class="heading">Popular <span>categories</span></h1>
-        <p class="sub">Everything on the menu, sorted the way you actually order it.</p>
-    </div>
-    <div class="box-container" id="categoryGrid"></div>
-</section>
-
-<!-- featured meals -->
-<section class="popular" id="popular">
-    <div class="section-head">
-        <span class="eyebrow">Fan Favourites</span>
-        <h1 class="heading">Featured <span>meals</span></h1>
-        <p class="sub">The dishes our regulars order again and again.</p>
-    </div>
-    <div class="box-container" id="featuredGrid"></div>
-    <div style="text-align:center; margin-top:3.5rem;">
-    <a href="menu.html" class="btn outline">View Full Menu <i class="fa-solid fa-utensils"></i></a>
-</section>
-
-<!-- reviews -->
-<section class="reviews" id="review">
-    <div class="section-head">
-        <span class="eyebrow">Word On The Street</span>
-        <h1 class="heading">What people <span>are saying</span></h1>
-    </div>
-    <div class="box-container" id="reviewsGrid"></div>
-
-    <div class="review-form-wrap">
+<section class="cart-section">
+    <div class="cart-layout">
         <div class="form-card">
-            <h3 style="font-family:var(--font-display); font-size:2.2rem; letter-spacing:.04rem; color:var(--text); margin-bottom:.6rem;">Leave a Review</h3>
-            <p class="sub" style="margin:0 0 2rem;">Your review will appear here once we approve it.</p>
-            <form id="reviewForm">
+            <form id="checkoutForm">
+                <div class="field">
+                    <label for="coName">Full Name</label>
+                    <input type="text" id="coName" required placeholder="e.g. Kobi ">
+                </div>
                 <div class="field-row">
                     <div class="field">
-                        <label for="rvName">Name</label>
-                        <input type="text" id="rvName" required placeholder="Your name">
+                        <label for="coPhone">Phone Number</label>
+                        <input type="tel" id="coPhone" required placeholder="+232 34810013">
                     </div>
                     <div class="field">
-                        <label for="rvLocation">Location (optional)</label>
-                        <input type="text" id="rvLocation" placeholder="e.g. Freetown">
+                        <label for="coCity">City / Area</label>
+                        <input type="text" id="coCity" required placeholder="e.g. Rokel, Freetown">
                     </div>
                 </div>
                 <div class="field">
-                    <label for="rvRating">Rating</label>
-                    <select id="rvRating" required>
-                        <option value="5">5 — Excellent</option>
-                        <option value="4">4 — Great</option>
-                        <option value="3">3 — Good</option>
-                        <option value="2">2 — Okay</option>
-                        <option value="1">1 — Poor</option>
-                    </select>
+                    <label for="coAddress">Delivery Address</label>
+                    <textarea id="coAddress" required placeholder="Street, house number and any landmark to help our rider find you"></textarea>
                 </div>
+
                 <div class="field">
-                    <label for="rvMessage">Your Review</label>
-                    <textarea id="rvMessage" required placeholder="Tell us about your experience"></textarea>
+                    <label>Payment Method</label>
+                    <div class="pay-options">
+                        <label class="pay-option">
+                            <input type="radio" name="payment" value="Cash on Delivery" checked>
+                            <i class="fa-solid fa-money-bill-wave"></i> Cash on Delivery
+                        </label>
+                        <label class="pay-option">
+                            <input type="radio" name="payment" value="Mobile Money">
+                            <i class="fa-solid fa-mobile-screen"></i> Mobile Money
+                        </label>
+                        <label class="pay-option">
+                            <input type="radio" name="payment" value="Card">
+                            <i class="fa-solid fa-credit-card"></i> Card on Delivery
+                        </label>
+                    </div>
                 </div>
-                <button type="submit" class="btn block">Submit Review <i class="fa-solid fa-paper-plane"></i></button>
-                <div class="form-msg" id="reviewMsg"></div>
+
+                <button type="submit" class="btn block">Place Order <i class="fa-solid fa-fire"></i></button>
             </form>
+        </div>
+
+        <div class="summary-card">
+            <h3>Order Summary</h3>
+            <div id="checkoutSummary"></div>
         </div>
     </div>
 </section>
 
-<!-- footer -->
 <footer>
     <div class="footer-grid">
         <div>
