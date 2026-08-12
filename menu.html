@@ -33,11 +33,11 @@
         </div>
     </div>
 
-    <div id="menu-bar"><i class="fa-solid fa-bars"></i></div>
+    <div id="menu-bar" role="button" tabindex="0" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></div>
 
     <form class="search-box" id="headerSearchForm">
-        <input type="text" id="headerSearchInput" placeholder="Search for grilled chicken, shawarma...">
-        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <input type="text" id="headerSearchInput" placeholder="Search for grilled chicken, shawarma..." aria-label="Search the menu">
+        <button type="submit" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
     </form>
 </header>
 
@@ -51,7 +51,7 @@
     <div class="menu-toolbar">
         <div class="menu-search">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="menuSearchInput" placeholder="Search the menu...">
+            <input type="text" id="menuSearchInput" placeholder="Search the menu..." aria-label="Search the menu">
         </div>
         <div class="filter-pills" id="filterPills"></div>
     </div>
