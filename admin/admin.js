@@ -210,6 +210,11 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     if (submitBtn) submitBtn.disabled = false;
 
     if (error){
+        // logged to the console only (never shown to the user) — check
+        // DevTools → Console to see the real reason a login failed while
+        // debugging, e.g. a captcha misconfiguration vs an actual wrong
+        // password vs an unconfirmed email
+        console.error('Login error (for debugging only):', error);
         recordFailedAttempt();
         // deliberately generic: never reveal whether the email exists,
         // whether it's unconfirmed, or whether it was the password that
