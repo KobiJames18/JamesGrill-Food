@@ -34,6 +34,20 @@ function escapeHtml(str){
 }
 
 /* ============================================
+   TURNSTILE (CAPTCHA)
+   Real, server-enforced bot/brute-force protection — unlike the client-side
+   throttle below, this can't be bypassed by calling the Supabase API
+   directly, because Supabase itself verifies the token with Cloudflare
+   before allowing the login to proceed.
+   ============================================ */
+let turnstileToken = null;
+window.onTurnstileVerified = function(token){ turnstileToken = token; };
+function resetTurnstile(){
+    if (window.turnstile) window.turnstile.reset();
+    turnstileToken = null;
+}
+
+/* ============================================
    AUTH
    ============================================ */
 const loginSection = document.getElementById('adminLogin');
@@ -176,10 +190,22 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         return;
     }
 
+    if (!turnstileToken){
+        showLoginError('Please complete the verification check below.');
+        return;
+    }
+
     const submitBtn = document.querySelector('#loginForm button[type="submit"]');
     if (submitBtn) submitBtn.disabled = true;
 
-    const { error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+    const { error } = await window.supabaseClient.auth.signInWithPassword({
+        email, password,
+        options: { captchaToken: turnstileToken }
+    });
+
+    // Turnstile tokens are single-use — always reset after an attempt,
+    // whether it succeeded or failed, so the next attempt gets a fresh one
+    resetTurnstile();
 
     if (submitBtn) submitBtn.disabled = false;
 
