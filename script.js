@@ -867,4 +867,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     initContactPage();
     loadReviews();
     initReviewForm();
-});
+}); 
