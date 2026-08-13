@@ -260,11 +260,7 @@ header .logo i{
 }
 
 .navbar a{
-<<<<<<< HEAD
     font-size: 1.9rem;
-=======
-    font-size: 1.7rem;
->>>>>>> 0b19f4fe020a392ab621790407139442f22ddb36
     font-weight:600;
     color:var(--text-muted);
     text-transform: uppercase;
