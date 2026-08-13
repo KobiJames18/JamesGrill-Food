@@ -23,14 +23,23 @@ function rowToMenuItem(row){
     };
 }
  
+// wraps a promise so it can't hang forever - rejects after `ms` if the
+// original promise hasn't settled yet (e.g. a stalled network request)
+function withTimeout(promise, ms){
+    return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), ms))
+    ]);
+}
+
 async function loadMenuData(){
     try {
         if (!window.supabaseClient) throw new Error('Supabase not configured');
  
-        const [itemsRes, catsRes] = await Promise.all([
+        const [itemsRes, catsRes] = await withTimeout(Promise.all([
             window.supabaseClient.from('menu_items').select('*').order('category'),
             window.supabaseClient.from('categories').select('*')
-        ]);
+        ]), 8000);
  
         if (itemsRes.error) throw itemsRes.error;
         if (catsRes.error) throw catsRes.error;
@@ -46,4 +55,3 @@ async function loadMenuData(){
         window.CATEGORIES = DEFAULT_CATEGORIES;
     }
 }
- 

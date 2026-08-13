@@ -552,7 +552,46 @@ function initCheckoutPage(){
 
     let checkoutSubmitting = false;
 
-    form.addEventListener('submit', (e) => {
+    // wraps a promise so it can't hang forever - rejects after `ms` if the
+    // original promise hasn't settled yet (e.g. a stalled network request)
+    function withTimeout(promise, ms){
+        return Promise.race([
+            promise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), ms))
+        ]);
+    }
+
+    // tries to insert the order into Supabase, retrying once on failure
+    async function syncOrderToSupabase(order, attempt){
+        if (!window.supabaseClient) return { error: new Error('Supabase not configured') };
+        try {
+            const { error } = await withTimeout(
+                window.supabaseClient.from('orders').insert({
+                    id: order.id,
+                    customer_name: order.name,
+                    customer_phone: order.phone,
+                    address: order.address,
+                    payment_method: order.payment,
+                    items: order.items,
+                    subtotal: order.subtotal,
+                    delivery: order.delivery,
+                    total: order.total,
+                    status: order.status
+                }),
+                10000
+            );
+            if (error && attempt === 1) {
+                // one retry in case of a brief network blip
+                return syncOrderToSupabase(order, 2);
+            }
+            return { error };
+        } catch (err) {
+            if (attempt === 1) return syncOrderToSupabase(order, 2);
+            return { error: err };
+        }
+    }
+
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (checkoutSubmitting) return; // guard against double-click creating two orders
         const cartNow = getCart();
@@ -560,7 +599,7 @@ function initCheckoutPage(){
 
         checkoutSubmitting = true;
         const submitBtn = form.querySelector('button[type="submit"]');
-        if (submitBtn) submitBtn.disabled = true;
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Placing order…'; }
 
         const name = document.getElementById('coName').value.trim();
         const phone = document.getElementById('coPhone').value.trim();
@@ -583,29 +622,22 @@ function initCheckoutPage(){
             status: 'Processing'
         };
 
+        // wait for Supabase to actually confirm the order before proceeding,
+        // so we know for certain whether the admin panel will see it
+        const { error } = await syncOrderToSupabase(order, 1);
+
+        if (error) {
+            checkoutSubmitting = false;
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Place Order'; }
+            alert('Sorry, we could not place your order — please check your internet connection and try again. If this keeps happening, please call us directly to order.');
+            console.warn('Order failed to sync to admin panel:', error.message || error);
+            return;
+        }
+
         const orders = getOrders();
         orders.unshift(order);
         saveOrders(orders);
         saveCart([]);
-
-        // best-effort push to Supabase so the order shows up in the admin panel;
-        // checkout still succeeds locally even if this fails or Supabase isn't configured
-        if (window.supabaseClient) {
-            window.supabaseClient.from('orders').insert({
-                id: order.id,
-                customer_name: order.name,
-                customer_phone: order.phone,
-                address: order.address,
-                payment_method: order.payment,
-                items: order.items,
-                subtotal: order.subtotal,
-                delivery: order.delivery,
-                total: order.total,
-                status: order.status
-            }).then(({ error }) => {
-                if (error) console.warn('Could not sync order to admin panel:', error.message);
-            });
-        }
 
         window.location.href = 'orders.html?placed=' + order.id;
     });
